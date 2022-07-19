@@ -171,17 +171,10 @@ def convert_to_lcz(*args, **kwargs) -> list:
                         }
 
         with open("LCZ_key_data.json", "w") as fp:
-            json.dump(LCZ_tresholds , fp) # use indent=4 to make json more readable
-
-    def between(number: any, range_list: list) -> list:
-        """Checks if a number is between two values"""
-        if range_list[0] <= range_list[1]:
-            return range_list[0] <= number <= range_list[1]
-        else:
-            raise ValueError("First value in range_list must be smaller \
-                              than second value!")
-
-    def comb(keys, param_row):
+            # use indent=4 to make json more readable
+            json.dump(LCZ_tresholds , fp) 
+    
+    def comb(keys: object, param_row: dict) -> object:
         """
         Goes through the data and returns a DataFrames full of booleans.
 
@@ -230,8 +223,25 @@ def convert_to_lcz(*args, **kwargs) -> list:
     if 1 in means[0].unique():
         LCZ_row = int(means[means[0] == 1].index[0])
         return (LCZ_row, LCZ_key["name"].iloc[2])
-    
+
+def between(number: any, range_list: list) -> list:
+        """Checks if a number is between two values"""
+        if range_list[0] <= range_list[1]:
+            return range_list[0] <= number <= range_list[1]
+        else:
+            raise ValueError("First value in range_list must be smaller \
+                              than second value!")
+
+def main():
+    LCZ_code, LCZ_name = convert_to_lcz(sky_view_f=0.4, aspect_r=0.90, \
+                                        build_srf=50, imperv_srf=40, \
+                                        perv_srf=25, hgt_rough=6, terr_rough=6)
+
+    LCZ_code, LCZ_name = ls
+
+    print(LCZ_code, LCZ_name)
+    input("Press Enter to exit") # stop console from ending if you run the .py
+
 
 if __name__ == "__main__":
-    convert_to_lcz(sky_view_f=0.4, aspect_r=0.90, build_srf=50, \
-                   imperv_srf=40, perv_srf=25, hgt_rough=6, terr_rough=6)
+    main()
