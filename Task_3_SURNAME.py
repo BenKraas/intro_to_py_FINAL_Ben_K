@@ -44,11 +44,13 @@ Test your code with the following values
 import json
 import pandas as pd
 from os.path import exists
+
+
 def convert_to_lcz(**kwargs) -> list:
     """
     This functions calculates the LCZ (Local climate zone) given 7 parameters
 
-    Accepted parameters are:
+    Accepted parameters are (in order):
     sky_view_f  : sky view factor
     aspect_r    : aspect ratio
     build_srf   : building surface fraction
@@ -63,7 +65,7 @@ def convert_to_lcz(**kwargs) -> list:
     Otherwise, the returned list will contain:
     [LCZ_code, LCZ_name]
 
-    Author: Ben Kraas
+    Author: Ben Kraas (https://github.com/KtRNofficial)
     """
 
     # preparation
@@ -75,12 +77,28 @@ def convert_to_lcz(**kwargs) -> list:
 
     LCZ_data = pd.DataFrame(data)
 
+    # importing of kwargs
+    
+    config_dict = {}
+    if len(kwargs == 1) and type(kwargs) == "list":
+        print("it is a list")
+    else:
+        for content in kwargs:
+            config_dict[content] = content
     # function body
 
 
 def dump_data_json():
-    """Call this function to create the LCZ_key_data.json used in the function"""
+    """
+    Call this function to create the LCZ_key_data.json used in the function.
+    Automatically called by convert_to_lcz() if json does not exist
+    
+    Source: Task_3_LCZ_Thresholds.png
 
+    Author: Ben Kraas (https://github.com/KtRNofficial)
+    """
+
+    idx_list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     nam_list = ["Compact high-rise", "Compact midrise", "Compact low-rise", \
                 "Open high-rise", "Open midrise", "Open low-rise", \
                 "Lightweight low-rise", "Large low-rise", "Sparsely built"]
@@ -95,19 +113,24 @@ def dump_data_json():
                 [30, 50], [20, 50], [00, 20], [40, 50], [00, 20]]
     psf_list = [[00, 10], [00, 20], [00, 30], [30, 40], \
                 [20, 40], [30, 60], [00, 30], [00, 20], [60, 80]]
-
-    LCZ_tresholds = {"code":[1, 2, 3, 4, 5, 6, 7, 8, 9],
+    hre_list = [[25, 999], [10, 25], [3, 10], [25, 999],\
+                [10, 25], [3, 10], [2, 4], [3, 10], [3, 10]]
+    trc_list = [[8, 8], [6, 7], [6, 6], [7, 8], \
+                [5, 6], [5, 6], [4, 5], [5, 5], [5, 6]]
+    
+    LCZ_tresholds = {"code": idx_list,
                      "name": nam_list,
                      "sky_view_factor": svf_list,
                      "aspect_ratio": apr_list,
                      "building_surf_fract": bsf_list,
-                     "impervious_surf_fract": isf_list,
-                     "pervious_surf_fract": psf_list,
-
+                     "impervious_surf_fract":isf_list,
+                     "pervious_surf_fract":  psf_list,
+                     "height_of_rough_elem": hre_list,
+                     "terrain_rough_class":  trc_list
                      }
 
     with open("LCZ_key_data", "w") as fp:
         json.dump(LCZ_tresholds , fp) 
     
 if __name__ == "__main__":
-    main()
+    convert_to_lcz([1, 2, 3, 4, 5, 6, 7, 8, 9])
