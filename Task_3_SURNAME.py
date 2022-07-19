@@ -221,13 +221,17 @@ def convert_to_lcz(*args, **kwargs) -> list:
     # these are specifications which you want to check
     config_dict = import_args(args, kwargs)
 
-    # function body
+    # return dataframe with number in range or not (1=in range, 0=not in range)
     comb_bool = comb(LCZ_key, config_dict)
 
-    # only calculate the mean for all columns
+    # calculate the mean for each row, but only for numeric columns
+    means = pd.DataFrame(comb_bool[numeric_cols].mean(axis=1))
+
+    if 1 in means[0].unique():
+        LCZ_row = int(means[means[0] == 1].index[0])
+        return (LCZ_row, LCZ_key["name"].iloc[2])
     
 
-    print(comb_bool[numeric_cols].mean(axis=1))
-
 if __name__ == "__main__":
-    convert_to_lcz(sky_view_f=0.4, aspect_r=0.90, build_srf=50, imperv_srf=40, perv_srf=25, hgt_rough=6, terr_rough=6)
+    convert_to_lcz(sky_view_f=0.4, aspect_r=0.90, build_srf=50, \
+                   imperv_srf=40, perv_srf=25, hgt_rough=6, terr_rough=6)
