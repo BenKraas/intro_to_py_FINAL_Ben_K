@@ -36,8 +36,29 @@ with open(savename, "w") as f:
 
 
 
-
-
+def bounds_to_geojson(coordinates: tup, savepath: str) -> None:
+    """This function creates a bounding box from four coordinates (western and eastern longitude and northern and southern latitude) in the format (lon_E, lat_S, lon_W, lat_N)"""
+    cd = coordinates
+    test_dictionary = {
+        "type": "Feature",
+        "properties": {},
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [cd[2], cd[3],
+                [cd[0], cd[3]],
+                [cd[0], cd[1]],
+                [cd[2], cd[1]],
+                [cd[2], cd[3]]
+            ]
+        }
+    }
+    if saveloc[:-2] != "//" :
+        saveloc = saveloc + "//"
+    savename = "test.geojson"
+    saveloc = safepath + savename
+    with open(savename, "w") as f:
+        json.dump(test_dictionary, f, indent=4)
 
 """
 Subtask 4.2
