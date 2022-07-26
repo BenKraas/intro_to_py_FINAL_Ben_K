@@ -16,48 +16,34 @@ the given coordinates and save it at the given savepath.
 Hint:  See the example below on how to save a geojson dictionary.
 """
 
+def bounds_to_geojson(coordinates: tuple, savepath: str):
+    """
+    This function creates a bounding box from four coordinates 
+    (western and eastern longitude and northern and southern latitude) 
+    in the format (lon_E, lat_S, lon_W, lat_N)
 
+    GeoJSON is saved in the specified location - the savepath MUST 
+    include the name and extension of the geojson
 
-# To save a geojson dict to a file adopt the following example:
-test_dictionary = {
-    "type": "Feature",
-    "properties": {},
-    "geometry": {
-        "type": "LineString",
-        "coordinates": [
-            [0.0, 0.0],
-            [50.0, 40.0]
-        ]
-    }
-}
-savename = "test.geojson"
-with open(savename, "w") as f:
-    json.dump(test_dictionary, f, indent=4)
+    Example: "script_dir//bounding_box.geojson"
+    """
 
-
-
-def bounds_to_geojson(coordinates: tup, savepath: str) -> None:
-    """This function creates a bounding box from four coordinates (western and eastern longitude and northern and southern latitude) in the format (lon_E, lat_S, lon_W, lat_N)"""
     cd = coordinates
     test_dictionary = {
         "type": "Feature",
         "properties": {},
         "geometry": {
             "type": "Polygon",
-            "coordinates": [
-                [cd[2], cd[3],
+            "coordinates": [[
+                [cd[2], cd[3]],
                 [cd[0], cd[3]],
                 [cd[0], cd[1]],
                 [cd[2], cd[1]],
                 [cd[2], cd[3]]
-            ]
+            ]]
         }
     }
-    if saveloc[:-2] != "//" :
-        saveloc = saveloc + "//"
-    savename = "test.geojson"
-    saveloc = safepath + savename
-    with open(savename, "w") as f:
+    with open(savepath, "w") as f:
         json.dump(test_dictionary, f, indent=4)
 
 """
@@ -75,6 +61,33 @@ import json
 with open("polygon.geojson", "r") as f:
     polygon = json.load(f)
 
+
+# required by task
+def single_poly_to_point(polydict: dict):
+    """
+    This function converts a single polygon to points.
+    If multiple polygons are provided only the first one will be converted
+    Returns a dict in geojson format
+    """
+    enddict = polydict
+    enddict["geometry"]["type"] = "MultiPoint"
+    enddict["geometry"]["coordinates"] = polydict["geometry"]["coordinates"][0]
+    return enddict
+
+# more versatile and likely more useful
+def poly_to_point(polydict: dict):
+    """
+    This function converts all polygons in a geojson to points
+    Returns a dict in geojson format
+    """
+    pointlist = []
+    enddict = polydict
+    enddict["geometry"]["type"] = "MultiPoint"
+    for polygon in polydict["geometry"]["coordinates"]:
+        for point in polygon:
+            pointlist.append(point)
+    enddict["geometry"]["coordinates"] = pointlist
+    return enddict
 
 
 
