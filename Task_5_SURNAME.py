@@ -11,19 +11,31 @@ represents all the major rivers of the world as linestrings.
 
 Answer the following 4 tasks.
 
-testing
-aaa
+
+def save(dict, path):
+    with open(path, "w") as f:
+        json.dump(dict, f, indent=4)
 
 
 Subtask 5.1
 -----------
 Use a for loop to print the name of each river.
 
+for feature in rivers["features"]
+    print(feature["properties"]["name"]
 
 Subtask 5.2
 -----------
 Create a new geojson file that includes only the river Nile.
 
+new_rivers = rivers
+for feature in rivers["features"]
+    name = feature["properties"]["name"]
+    if lower(name) == "nile"
+        new_rivers["features"] = feature
+        break
+if new_rivers["features"]:
+       
 
 Subtask 5.3
 -----------
