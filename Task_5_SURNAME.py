@@ -25,7 +25,7 @@ for river in rivers.
 
 rivers = bk.GeojsonObject()
 
-rivers.load('rivers.geojson')
+rivers.loadwd('rivers.geojson')
 
 print(rivers.get_names())
 
@@ -36,6 +36,13 @@ Subtask 5.2
 Create a new geojson file that includes only the river Nile.
 """
 
+id = rivers.query_name("Nile")
+
+new_dict = bk.new_geojson()
+new_gjson = bk.GeojsonObject(new_dict)
+
+new_feature = rivers.get_feature(id)
+new_gjson.append()
        
 """
 Subtask 5.3
