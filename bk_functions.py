@@ -21,22 +21,33 @@ def load_json(path):
         data = json.load(json_file)
     return data
 
+def beautydump(jsondict: dict, savepath):
+    with open(savepath, "w") as f:
+        json.dump(jsondict, f, indent=4)
+
+def dump(jsondict: dict, savepath):
+    with open(savepath, "w") as f:
+        json.dump(jsondict, f)
+
 class GeojsonObject:
     """
-    This class introduces an object-based approach to Geojson handling.
+    This class introduces an object-based approach to geojson handling.
     Child objects on a per-feature basis could be implemented in the future.
 
     Author: Ben Kraas (https://github.com/KtRNofficial)
     """
-    
 
     def __init__(self, geojson={}, name="default.geojson"):
         """
-        Object can be populated by passing a geojson and name to the constructor 
+        Initializes the GeojsonObject
+
+        Object must be populated by passing a geojson and name to the constructor 
         OR 
-        it needs to be populated with loadwd() - specifying a path in working dir
+        it must be populated with loadwd() - specifying a path in working dir (EASIEST)
         OR
-        it needs to be populated with loadrel() - specifying a full path
+        it must be populated with loadrel() - specifying a full path
+        OR
+        it must be populated with loadsample() - a sample dictionary will be loaded
         """
         self.dict = geojson
         self.dict_path = Path(name).absolute()
@@ -53,17 +64,21 @@ class GeojsonObject:
         """Loads a geosjon dict from a full system path including name."""
         self.dict_path = Path(path)
         self.dict = load_json(self.dict_path)
+    
+    def loadsample(self):
+        self.dict_path = Path("sample.geojson").absolute()
+        self.dict = load_json(self.dict_path)
 
-    def dumpto(self, path: object):
+    def dumpto(self, path):
         with open(path, "w") as fp:
             # use indent=4 to make json more readable
-            json.dump(path.name, fp)
+            json.dump(self.dict, fp, indent=4)
         
     def dump(self):
-        self.dumpto(self.dict_path)
+        newname = Path("edited_" + self.dict_path.name).absolute()
+        self.dumpto(newname)
     
-    def example():
-        print(load_json("example.geojson"))
+    
 
     def get_name(self, id):
         return self.dict["features"][id]["properties"]["name"]
@@ -112,8 +127,12 @@ class GeojsonObject:
             return nameids
         return None
 
+    def clear(self):
+        """Deletes all features from self.dict"""
+        self.dict["features"] = []
+
     def convert_to_multipoint(self, inplace=False):
-        """Converts all """
+        """This function converts all polygons in a geojson to a single MultiPoint feature"""
         types = self.get_types()
         finalls = []
         if len(types) > 1:
@@ -121,40 +140,55 @@ class GeojsonObject:
 
         for feature in self.dict["features"]:
             for elem in feature["geometry"]["coordinates"]:
-                partls = self.private_coordcrawler(elem)
+                partls = self.PRIVATE_coordcrawler(elem)
                 for elem in partls:
                     finalls.append(elem)
 
         if inplace:
-            self.dict["features"] = []
-            self.dict["features"].append(self.private_new_feature(type="MultiPoint"))
-            self.dict["features"][0]["geometry"]["type"] = "MultiPoint"
-            self.dict["features"][0]["geometry"]["coordinates"] = finalls
+            self.clear()
+            self.dict["features"].append(self.PRIVATE_new_feature(featuretype="MultiPoint", coordinates=finalls))
+            # self.dict["features"][0]["geometry"]["coordinates"] = finalls
 
         else:
             retdict = self.dict
-            retdict["features"][0]["geometry"]["type"] = "MultiPoint"
-            retdict["features"][0]["geometry"]["coordinates"] = finalls
-            return(self.private_set_features(retdict, finalls))
+            retdict["features"] = []
+            retdict["features"].append(self.PRIVATE_new_feature(featuretype="MultiPoint", coordinates=finalls))
+            return retdict
 
-    def private_set_features(self, change_dict, content):
-        change_dict["features"][0].append(content)
-        return change_dict
+    def convert_to_multipoint_alt(self, inplace=False):
+        """
+        DEPRECATED!
+
+        This function converts all polygons in a geojson to a single MultiPoint feature
+        """
+        pointlist = []
+        enddict = self.dict
+
+        for polygon in self.dict["features"]:
+            if polygon["geometry"]["type"] == "Polygon":
+                for pointl in polygon["geometry"]["coordinates"]:
+                    for point in pointl:
+                        print(point)
+                        pointlist.append(point)
+        enddict["features"][0]["geometry"]["type"] = "MultiPoint"
+        enddict["features"][0]["geometry"]["coordinates"] = pointlist
+
+        if inplace:
+            self.dict = enddict
+        else:
+            return enddict
     
-    def private_new_feature(featuretype, coordinates):
+    def PRIVATE_new_feature(self, featuretype, coordinates):
         return {
             "type": "Feature",
+            "properties": {},
             "geometry": {
                 "type": featuretype,
                 "coordinates": coordinates
             }
         }
         
-    def convert_to_point(self):
-        """Converts all coordinate pairs to points"""
-        pass
-    
-    def private_coordcrawler(self, *args):
+    def PRIVATE_coordcrawler(self, *args):
         coords = []
         for elem in args:
             if isinstance(elem[0], list):

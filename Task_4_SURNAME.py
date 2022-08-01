@@ -15,9 +15,6 @@ the given coordinates and save it at the given savepath.
 
 Hint:  See the example below on how to save a geojson dictionary.
 """
-
-
-
 def bounds_to_geojson(coordinates: tuple, savepath: str):
     """
     This function creates a bounding box from four coordinates 
@@ -45,8 +42,8 @@ def bounds_to_geojson(coordinates: tuple, savepath: str):
             ]]
         }
     }
-    with open(savepath, "w") as f:
-        json.dump(test_dictionary, f, indent=4)
+    bk.beautydump(test_dictionary, savepath)
+    
 
 """
 Subtask 4.2
@@ -57,12 +54,29 @@ Test your code with the following polygon:
 
 """
 
-# To read the `polygon.geojson` file use the following:
+import bk_functions as bk
+
+gobj = bk.GeojsonObject()
+gobj.loadwd("polygon.geojson")
+
+print(gobj.dict)
+
+gobj.convert_to_multipoint(inplace=True)
+
+print(gobj.dict)
+
+
+
+
+
+
+
+# DEPRECATED but working functions (I made these before I implemented the object-oriented approach)
+
 import json
 
 with open(r"C:\Users\Kasto\OneDrive\Scripts\Python Seminar Übung\intro_to_py_FINAL_Ben_K\polygon.geojson", "r") as f:
     polygon = json.load(f)
-
 
 # required by task
 def single_poly_to_point(polydict: dict):
@@ -77,7 +91,7 @@ def single_poly_to_point(polydict: dict):
     enddict["features"][0]["geometry"]["coordinates"] = polydict["features"][0]["geometry"]["coordinates"][0]
     return enddict
 
-# more versatile and likely more useful
+# more versatile and likely more useful as it can convert any number of polygons
 def poly_to_point(polydict: dict):
     """
     This function converts all polygons in a geojson to points
@@ -89,14 +103,10 @@ def poly_to_point(polydict: dict):
         if polygon["geometry"]["type"] == "Polygon":
             for pointl in polygon["geometry"]["coordinates"]:
                 for point in pointl:
-                    print(point)
                     pointlist.append(point)
     enddict["features"][0]["geometry"]["type"] = "MultiPoint"
     enddict["features"][0]["geometry"]["coordinates"] = pointlist
     return enddict
 
-print(poly_to_point(polygon))
-
-
-
+# print(poly_to_point(polygon))
 

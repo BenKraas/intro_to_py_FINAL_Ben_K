@@ -174,7 +174,7 @@ def convert_to_lcz(*args, **kwargs):
             # use indent=4 to make json more readable
             json.dump(LCZ_tresholds , fp) 
     
-    def comb(keys: object, param_row: dict) -> object:
+    def comb(keys: object, param_row: dict):
         """
         Goes through the data and returns a DataFrames full of booleans.
 
