@@ -10,21 +10,34 @@ You are given the geojson file `rivers.geojson`, which
 represents all the major rivers of the world as linestrings.
 
 Answer the following 4 tasks.
+"""
+import bk_functions as bk
+import json
 
-testing
-aaa
-
-
+"""
 Subtask 5.1
 -----------
 Use a for loop to print the name of each river.
+for river in rivers.
+"""
+
+# data = bk.load_json('rivers.geojson')
+
+rivers = bk.GeojsonObject()
+
+rivers.load('rivers.geojson')
+
+print(rivers.get_names())
 
 
+"""
 Subtask 5.2
 -----------
 Create a new geojson file that includes only the river Nile.
+"""
 
 
+"""
 Subtask 5.3
 -----------
 Calculate the length of each river and add it as a property.

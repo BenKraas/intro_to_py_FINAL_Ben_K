@@ -16,6 +16,8 @@ Hint: To solve the tasks below, specify the keys and the indices you need manual
 # prerequisite:
 ls = list()
 
+PRINT_LIST = True
+
 
 # To read the `lakes.geojson` file use the following:
 import json
@@ -118,9 +120,9 @@ ls.append(len(lakes["features"])) # confirm that the list has been shortened
 
 
 
-
-for number in ls:
-	print(str(number).replace("\n", ""))
+if PRINT_LIST:
+	for number in ls:
+		print(str(number).replace("\n", ""))
 
 
 input("Enter to close...")

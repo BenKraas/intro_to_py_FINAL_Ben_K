@@ -44,9 +44,10 @@ Test your code with the following values
 import json
 import pandas as pd
 from os.path import exists
+import bk_functions as bk
 
 
-def convert_to_lcz(*args, **kwargs) -> list:
+def convert_to_lcz(*args, **kwargs):
     """
     This functions calculates the LCZ (Local climate zone) given 7 parameters.
 
@@ -70,9 +71,9 @@ def convert_to_lcz(*args, **kwargs) -> list:
     """
 
     # nested functions
-    def import_lcz_data() -> object:
+    def import_lcz_data():
         """
-        Private function specific to convert_to_lcz()
+        PRIVATE function specific to convert_to_lcz()
 
         Imports/creates the lcz key data used to classify the lczs.
         Returns the data as a pandas DataFrame.
@@ -86,17 +87,16 @@ def convert_to_lcz(*args, **kwargs) -> list:
             print("JSON created!")
             dump_data_json()
         
-        with open('LCZ_key_data.json') as json_file:
-            data = json.load(json_file)
+        data = bk.load_json('LCZ_key_data.json')
 
         dataf = pd.DataFrame(data)
         dataf.set_index("code", inplace=True)
 
         return dataf
 
-    def import_args(args: tuple, kwargs: dict) -> dict:
+    def import_args(args: tuple, kwargs: dict):
         """
-        Private function specific to convert_to_lcz()
+        PRIVATE function specific to convert_to_lcz()
 
         This function correctly imports all the args and kwargs for 
         convert_to_lcz()
@@ -131,7 +131,7 @@ def convert_to_lcz(*args, **kwargs) -> list:
 
     def dump_data_json():
         """
-        Private function specific to convert_to_lcz()
+        PRIVATE function specific to convert_to_lcz()
 
         Call this function to create the LCZ_key_data.json used in the function.
         Automatically called by convert_to_lcz() if json does not exist
@@ -224,7 +224,7 @@ def convert_to_lcz(*args, **kwargs) -> list:
         LCZ_row = int(means[means[0] == 1].index[0])
         return (LCZ_row, LCZ_key["name"].iloc[2])
 
-def between(number: any, range_list: list) -> list:
+def between(number: any, range_list: list):
         """Checks if a number is between two values"""
         if range_list[0] <= range_list[1]:
             return range_list[0] <= number <= range_list[1]
@@ -237,7 +237,7 @@ def main():
                                         build_srf=50, imperv_srf=40, \
                                         perv_srf=25, hgt_rough=6, terr_rough=6)
 
-    LCZ_code, LCZ_name = ls
+    # LCZ_code, LCZ_name = ls
 
     print(LCZ_code, LCZ_name)
     input("Press Enter to exit") # stop console from ending if you run the .py
