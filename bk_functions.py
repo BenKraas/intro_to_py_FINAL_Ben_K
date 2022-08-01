@@ -121,15 +121,31 @@ class GeojsonObject:
         for feature in self.dict["features"]:
             type_set.add(feature["geometry"]["type"])
         return type_set
+
+    def get_feature(self, id):
+        """Returns a feature dictionary by feature ID"""
+        if id:
+            return self.dict["features"][id]
+    
+    def get_features(self, id_list):
+        """Returns all feature dictionaries from an ID list"""
+        features = []
+        for id in id_list:
+            features.append(self.get_feature(id))
+        return features
     
     def get_feature_count(self):
         """Returns the number of individual features"""
         return len(self.dict["features"])
     
+    def get_property(self, id, property):
+        if id and property:
+            return self.dict["features"][id]["properties"].get(property)
+        
     def get_properties(self, id):
         if id:
             return self.dict["features"][id]["properties"]
-        raise ValueError(f"Properties for ID {id} not accessible")
+        raise ValueError(f"Properties for ID {id} is not accessible")
     
     def query_name(self, searchname):
         """
@@ -154,6 +170,11 @@ class GeojsonObject:
         if nameids:
             return nameids
         return None
+
+    def append(self, featuredict):
+        """Appends the specified featuredict to features"""
+        if featuredict:
+            self.dict["features"].append(featuredict)
 
     def wipe(self):
         """Deletes all features from self.dict"""
