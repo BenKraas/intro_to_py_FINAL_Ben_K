@@ -29,6 +29,24 @@ def dump(jsondict: dict, savepath):
     with open(savepath, "w") as f:
         json.dump(jsondict, f)
 
+def new_geojson():
+    """Return the structure of a geojson dictionary"""
+    return {
+        "type": "FeatureCollection",
+        "features": []
+    }
+
+def new_feature(featuretype="MultiPoint", coordinates=[]):
+    """Returns the structure of a single Feature. Can be populated"""
+    return {
+        "type": "Feature",
+        "properties": {},
+        "geometry": {
+            "type": featuretype,
+            "coordinates": coordinates
+        }
+    }
+
 class GeojsonObject:
     """
     This class introduces an object-based approach to geojson handling.
@@ -66,8 +84,12 @@ class GeojsonObject:
         self.dict = load_json(self.dict_path)
     
     def loadsample(self):
-        self.dict_path = Path("sample.geojson").absolute()
-        self.dict = load_json(self.dict_path)
+        pt = Path("sample.geojson").absolute()
+        try:
+            self.dict = load_json(self.dict_path)
+            self.dict_path = pt
+        except:
+            raise ImportError("Sample geojson not found :(")
 
     def dumpto(self, path):
         with open(path, "w") as fp:
@@ -77,35 +99,41 @@ class GeojsonObject:
     def dump(self):
         newname = Path("edited_" + self.dict_path.name).absolute()
         self.dumpto(newname)
-    
-    
 
     def get_name(self, id):
+        """Returns a features name from ID"""
         return self.dict["features"][id]["properties"]["name"]
 
     def get_names(self):
+        """Returns all feature names"""
         name_list = []
         for feature in self.dict["features"]:
             name_list.append(feature["properties"]["name"])
         return name_list
 
     def get_type(self, id):
-        """Returns the type of a single feature"""
+        """Returns a features type from ID"""
         return self.dict["features"][id]["geometry"]["type"]
 
     def get_types(self):
-        """Returns all types that occurr in the geojson"""
+        """Returns all feature types that occurr in the geojson"""
         type_set = set()
         for feature in self.dict["features"]:
             type_set.add(feature["geometry"]["type"])
         return type_set
     
     def get_feature_count(self):
+        """Returns the number of individual features"""
         return len(self.dict["features"])
+    
+    def get_properties(self, id):
+        if id:
+            return self.dict["features"][id]["properties"]
+        raise ValueError(f"Properties for ID {id} not accessible")
     
     def query_name(self, searchname):
         """
-        search the geojson for a name
+        Search the geojson for a searchname
         Returns the ID for the first name found.
         If name was not found returns None 
         """
@@ -116,7 +144,7 @@ class GeojsonObject:
 
     def query_names(self, searchname):
         """
-        Gives back a list of all IDs with a name
+        Gives back a list of all IDs with the searchname
         If no items with the name are found returns None
         """
         nameids = []
@@ -127,9 +155,13 @@ class GeojsonObject:
             return nameids
         return None
 
-    def clear(self):
+    def wipe(self):
         """Deletes all features from self.dict"""
         self.dict["features"] = []
+    
+    def clear(self):
+        """Deletes all features from self.dict"""
+        self.wipe() # is this function unnecessary and bad practice? Yes. I like both wipe and clear though
 
     def convert_to_multipoint(self, inplace=False):
         """This function converts all polygons in a geojson to a single MultiPoint feature"""
@@ -145,14 +177,14 @@ class GeojsonObject:
                     finalls.append(elem)
 
         if inplace:
-            self.clear()
-            self.dict["features"].append(self.PRIVATE_new_feature(featuretype="MultiPoint", coordinates=finalls))
+            self.wipe()
+            self.dict["features"].append(new_feature(featuretype="MultiPoint", coordinates=finalls))
             # self.dict["features"][0]["geometry"]["coordinates"] = finalls
 
         else:
             retdict = self.dict
             retdict["features"] = []
-            retdict["features"].append(self.PRIVATE_new_feature(featuretype="MultiPoint", coordinates=finalls))
+            retdict["features"].append(new_feature(featuretype="MultiPoint", coordinates=finalls))
             return retdict
 
     def convert_to_multipoint_alt(self, inplace=False):
@@ -178,7 +210,7 @@ class GeojsonObject:
         else:
             return enddict
     
-    def PRIVATE_new_feature(self, featuretype, coordinates):
+    def new_feature(self, featuretype, coordinates):
         return {
             "type": "Feature",
             "properties": {},

@@ -15,6 +15,8 @@ the given coordinates and save it at the given savepath.
 
 Hint:  See the example below on how to save a geojson dictionary.
 """
+import bk_functions as bk
+
 def bounds_to_geojson(coordinates: tuple, savepath: str):
     """
     This function creates a bounding box from four coordinates 
@@ -28,22 +30,17 @@ def bounds_to_geojson(coordinates: tuple, savepath: str):
     """
 
     cd = coordinates
-    test_dictionary = {
-        "type": "Feature",
-        "properties": {},
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [[
-                [cd[2], cd[3]],
-                [cd[0], cd[3]],
-                [cd[0], cd[1]],
-                [cd[2], cd[1]],
-                [cd[2], cd[3]]
-            ]]
-        }
-    }
+    coord_list = [[[cd[2], cd[3]],
+                   [cd[0], cd[3]],
+                   [cd[0], cd[1]],
+                   [cd[2], cd[1]],
+                   [cd[2], cd[3]]]]
+    test_dictionary = bk.new_feature(featuretype="Polygon", coordinates=coord_list)
+
     bk.beautydump(test_dictionary, savepath)
     
+
+bounds_to_geojson((1, -1, -1, 1), "bk_bounds.geojson")
 
 """
 Subtask 4.2
@@ -53,8 +50,6 @@ a polygon, extracts the points, and returns them as a geojson feature collection
 Test your code with the following polygon:
 
 """
-
-import bk_functions as bk
 
 gobj = bk.GeojsonObject()
 gobj.loadwd("polygon.geojson")
