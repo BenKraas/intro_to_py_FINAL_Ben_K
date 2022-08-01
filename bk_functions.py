@@ -171,6 +171,18 @@ class GeojsonObject:
             return nameids
         return None
 
+    def calc_length(self, id):
+        """WIP"""
+        # if polygon: circumference, if line: length, if point: fail
+        pass
+
+    def calc_total_length(self):
+        """WIP"""
+        total = int
+        for id in range(self.get_feature_count()):
+            total += self.calc_length(id)
+        return total
+    
     def append(self, featuredict):
         """Appends the specified featuredict to features"""
         if featuredict:
