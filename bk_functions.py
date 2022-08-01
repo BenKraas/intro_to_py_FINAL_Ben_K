@@ -118,33 +118,48 @@ class GeojsonObject:
         finalls = []
         if len(types) > 1:
             raise TypeError("Cannot convert more than one type")
-        
+
         for feature in self.dict["features"]:
             for elem in feature["geometry"]["coordinates"]:
-                finalls.append(self.private_coordcrawler(self, elem))
-        print(finalls)
+                partls = self.private_coordcrawler(elem)
+                for elem in partls:
+                    finalls.append(elem)
+
         if inplace:
+            self.dict["features"] = []
+            self.dict["features"].append(self.private_new_feature(type="MultiPoint"))
             self.dict["features"][0]["geometry"]["type"] = "MultiPoint"
-            self.dict = self.private_set_features(self, self.dict, [finalls])
+            self.dict["features"][0]["geometry"]["coordinates"] = finalls
+
         else:
             retdict = self.dict
             retdict["features"][0]["geometry"]["type"] = "MultiPoint"
-            return(self.private_set_features(self, retdict, [finalls]))
+            retdict["features"][0]["geometry"]["coordinates"] = finalls
+            return(self.private_set_features(retdict, finalls))
 
     def private_set_features(self, change_dict, content):
-        change_dict["features"] = [] # clear features
-        change_dict["features"].append(content)
+        change_dict["features"][0].append(content)
         return change_dict
+    
+    def private_new_feature(featuretype, coordinates):
+        return {
+            "type": "Feature",
+            "geometry": {
+                "type": featuretype,
+                "coordinates": coordinates
+            }
+        }
         
     def convert_to_point(self):
         """Converts all coordinate pairs to points"""
         pass
     
-    def private_coordcrawler(self, ls):
+    def private_coordcrawler(self, *args):
         coords = []
-        for elem in ls:
-            print(elem)
-            if isinstance(elem, ls):
-                coords.append(self.private_coordcrawler(elem))
+        for elem in args:
+            if isinstance(elem[0], list):
+                for atom in elem:
+                    coords.append(atom)
             else:
                 coords.append(elem)
+        return coords
