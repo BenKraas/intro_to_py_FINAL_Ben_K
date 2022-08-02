@@ -1,15 +1,20 @@
 """
-Small collection of functions repeating over all 8 tasks
+Collection of functions and classes used repeatedly over all 8 tasks.
+I hope that this is not against the "rules" for the final exercise.
 
-Author - Ben Kraas
+Author: Ben Kraas (https://github.com/KtRNofficial)
 """
 
 """
 Disclaimer:
 
 I might not specify return values of functions as in
+
 foo(bar: int) -> not_specified:
-because it messes with syntax highlighting.
+    pass
+
+because it messes up syntax highlighting in VSC and 
+I can't have that during development.
 """
 
 import json
@@ -36,11 +41,11 @@ def new_geojson():
         "features": []
     }
 
-def new_feature(featuretype="MultiPoint", coordinates=[]):
-    """Returns the structure of a single Feature. Can be populated"""
+def new_feature(featuretype="MultiPoint", coordinates=[], properties={}):
+    """Returns the structure of a single Feature. Should be populated"""
     return {
         "type": "Feature",
-        "properties": {},
+        "properties": properties,
         "geometry": {
             "type": featuretype,
             "coordinates": coordinates
@@ -85,8 +90,9 @@ class GeojsonObject:
     
     def loadsample(self):
         pt = Path("sample.geojson").absolute()
+
         try:
-            self.dict = load_json(self.dict_path)
+            self.dict = load_json(pt)
             self.dict_path = pt
         except:
             raise ImportError("Sample geojson not found :(")
@@ -120,7 +126,16 @@ class GeojsonObject:
         type_set = set()
         for feature in self.dict["features"]:
             type_set.add(feature["geometry"]["type"])
+        if not type_set:
+            return False
         return type_set
+
+    def get_all_same_type(self):
+        """Returns type if all features are of the same type and False if not"""
+        types = self.get_types()
+        if len(types) > 1:
+            return False
+        return True
 
     def get_feature(self, id):
         """Returns a feature dictionary by feature ID"""
@@ -147,13 +162,17 @@ class GeojsonObject:
             return self.dict["features"][id]["properties"]
         raise ValueError(f"Properties for ID {id} is not accessible")
     
-    def query_name(self, searchname):
+    def query_name(self, searchname, casesensitive=False):
         """
-        Search the geojson for a searchname
+        Search the geojson for a searchname. 
         Returns the ID for the first name found.
-        If name was not found returns None 
+        If name was not found returns None.
         """
+        if not casesensitive:
+            searchname = searchname.lower()
         for id, name in enumerate(self.get_names()):
+            if not casesensitive:
+                name = name.lower()
             if name == searchname:
                 return id
         return None
@@ -174,6 +193,12 @@ class GeojsonObject:
     def calc_length(self, id):
         """WIP"""
         # if polygon: circumference, if line: length, if point: fail
+        feature = self.dict["features"][id]
+        ftype = feature["type"]
+        if not ftype:
+            raise ValueError(f"No feature found at feature id {id}")
+        if ftype == "Polygon":
+            feature["geometry"]["coordinates"]
         pass
 
     def calc_total_length(self):
@@ -254,6 +279,7 @@ class GeojsonObject:
         }
         
     def PRIVATE_coordcrawler(self, *args):
+        
         coords = []
         for elem in args:
             if isinstance(elem[0], list):
@@ -262,3 +288,4 @@ class GeojsonObject:
             else:
                 coords.append(elem)
         return coords
+

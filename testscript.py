@@ -2,8 +2,11 @@ from pathlib import Path
 import bk_functions as bk
 import json
 
-props = {"ttest": 1}
+gobj = bk.GeojsonObject()
+gobj.loadwd("rivers.geojson")
 
-var = props["one"]
+print(gobj.query_name("Mekong"))
 
+var = "blub"
+var.upper()
 print(var)
