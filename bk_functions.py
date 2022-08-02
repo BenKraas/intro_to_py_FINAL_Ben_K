@@ -18,6 +18,7 @@ I can't have that during development.
 """
 
 import json
+import math
 from pathlib import Path
 
 def load_json(path):
@@ -75,7 +76,7 @@ class GeojsonObject:
         self.dict = geojson
         self.dict_path = Path(name).absolute()
 
-    def loadwd(self, path):
+    def loadwd(self, path: object):
         """
         Loads a geosjon dict from working directory.
         This is the EASIEST way to load
@@ -83,7 +84,7 @@ class GeojsonObject:
         self.dict_path = Path(path).absolute()
         self.dict = load_json(self.dict_path)
     
-    def loadrel(self, path):
+    def loadrel(self, path: object):
         """Loads a geosjon dict from a full system path including name."""
         self.dict_path = Path(path)
         self.dict = load_json(self.dict_path)
@@ -97,13 +98,16 @@ class GeojsonObject:
         except:
             raise ImportError("Sample geojson not found :(")
 
-    def dumpto(self, path):
+    def dumpto(self, path: object):
         with open(path, "w") as fp:
             # use indent=4 to make json more readable
             json.dump(self.dict, fp, indent=4)
         
-    def dump(self):
-        newname = Path("edited_" + self.dict_path.name).absolute()
+    def dump(self, name=None):
+        if name:
+            newname = Path(name).absolute()
+        else:
+            newname = Path("edited_" + self.dict_path.name).absolute()
         self.dumpto(newname)
 
     def get_name(self, id):
@@ -139,7 +143,7 @@ class GeojsonObject:
 
     def get_feature(self, id):
         """Returns a feature dictionary by feature ID"""
-        if id:
+        if id is not None:
             return self.dict["features"][id]
     
     def get_features(self, id_list):
@@ -154,11 +158,11 @@ class GeojsonObject:
         return len(self.dict["features"])
     
     def get_property(self, id, property):
-        if id and property:
+        if id is not None and property:
             return self.dict["features"][id]["properties"].get(property)
         
     def get_properties(self, id):
-        if id:
+        if id is not None:
             return self.dict["features"][id]["properties"]
         raise ValueError(f"Properties for ID {id} is not accessible")
     
@@ -190,24 +194,57 @@ class GeojsonObject:
             return nameids
         return None
 
-    def calc_length(self, id):
-        """WIP"""
-        # if polygon: circumference, if line: length, if point: fail
-        feature = self.dict["features"][id]
-        ftype = feature["type"]
-        if not ftype:
-            raise ValueError(f"No feature found at feature id {id}")
-        if ftype == "Polygon":
-            feature["geometry"]["coordinates"]
-        pass
-
-    def calc_total_length(self):
-        """WIP"""
-        total = int
+    def query_all_property(self, propertyname):
+        propls = []
         for id in range(self.get_feature_count()):
-            total += self.calc_length(id)
+            propls.append(self.get_property(id, propertyname))
+        return propls
+
+
+    def calc_total(self, function):
+        """
+        Calculate a total value by running the passed function for every feature 
+        Currently supported functions are:
+        calc_length_geod
+        calc_circumference_geod
+
+        Example use would be: 
+        total_len = lineobj.calc_total(lineobj.calc_length_geod)
+        This would run the .calc_length_geod function for each feature in lineobj
+        """
+        total = 0
+        for id in range(self.get_feature_count()):
+            total += function(id)
         return total
+
+    def calc_circumference_geod(self, id):
+        """
+        Calculates the circumference (m) of a Polygon
+        Can only handle METRIC "coordinates" 
+
+        A conversion method is currently not planned
+        """
+        coordlist = self.dict["features"][id]["geometry"]["coordinates"][0]
+
+        ft_length = 0
+        for coord, c_pair in enumerate(coordlist):
+            if coord: # if id is used here to skip the zero-index - going from the second feature=>first to the end
+                ft_length += math.dist(c_pair, coordlist[(coord-1)])
+        return ft_length
+
     
+    def calc_length_geod(self, id):
+        """
+        Calculates the length (m) of a LineString
+        Can only handle METRIC "coordinates" 
+
+        A conversion method is currently not planned
+        """
+        # while it seems counterintuitive to have the same calculation take place
+        # for both polygons and linestrings, it makes sense due to the way the dictionaries
+        # are laid out
+        return self.calc_circumference_geod(id)
+
     def append(self, featuredict):
         """Appends the specified featuredict to features"""
         if featuredict:
@@ -288,4 +325,3 @@ class GeojsonObject:
             else:
                 coords.append(elem)
         return coords
-
