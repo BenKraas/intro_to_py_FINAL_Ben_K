@@ -200,7 +200,6 @@ class GeojsonObject:
             propls.append(self.get_property(id, propertyname))
         return propls
 
-
     def calc_total(self, function):
         """
         Calculate a total value by running the passed function for every feature 
@@ -222,7 +221,7 @@ class GeojsonObject:
         Calculates the circumference (m) of a Polygon
         Can only handle METRIC "coordinates" 
 
-        A conversion method is currently not planned
+        A conversion method is currently not planned (out of scope)
         """
         coordlist = self.dict["features"][id]["geometry"]["coordinates"][0]
 
@@ -232,13 +231,12 @@ class GeojsonObject:
                 ft_length += math.dist(c_pair, coordlist[(coord-1)])
         return ft_length
 
-    
     def calc_length_geod(self, id):
         """
         Calculates the length (m) of a LineString
         Can only handle METRIC "coordinates" 
 
-        A conversion method is currently not planned
+        A conversion method is currently not planned (out of scope)
         """
         # while it seems counterintuitive to have the same calculation take place
         # for both polygons and linestrings, it makes sense due to the way the dictionaries
@@ -304,19 +302,9 @@ class GeojsonObject:
             self.dict = enddict
         else:
             return enddict
-    
-    def new_feature(self, featuretype, coordinates):
-        return {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-                "type": featuretype,
-                "coordinates": coordinates
-            }
-        }
         
     def PRIVATE_coordcrawler(self, *args):
-        
+        """PRIVATE! Crawls through a coords dict and returns all coords individually"""
         coords = []
         for elem in args:
             if isinstance(elem[0], list):

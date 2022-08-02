@@ -5,7 +5,10 @@ Introduction to Programming and Applied Statistics
 ======================
 Final Project - TASK 6
 ======================
+"""
+import bk_functions as bk
 
+"""
 Subtask 6.1
 -----------
 Define a function that creates a multipart geojson
@@ -13,8 +16,12 @@ with N points randomly distributed over a geographical domain.
 The function should takes as arguments the number of points and
 the bounding box coordinates (lon_E, lat_S, lon_W, lat_N) of the
 geograhical domain.
+"""
+def scatter(extent, number):
+    pass
+bk.new_feature()
 
-
+"""
 Subtask 6.2
 -----------
 Define a function that creates a checkerboard grid of points for
@@ -24,8 +31,10 @@ The function should take as inputs:
 
 - the distance between the points in the x- and in the y-dimension.
 - the bounding box coordinates (lon_E, lat_S, lon_W, lat_N) of the
+"""
 
 
+"""
 Subtask 6.3
 -----------
 Define a function that creates a randomized grid of points over

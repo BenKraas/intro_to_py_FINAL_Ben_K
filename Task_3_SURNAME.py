@@ -220,9 +220,15 @@ def convert_to_lcz(*args, **kwargs):
     # calculate the mean for each row, but only for numeric columns
     means = pd.DataFrame(comb_bool[numeric_cols].mean(axis=1))
 
+    # 
     if 1 in means[0].unique():
         LCZ_row = int(means[means[0] == 1].index[0])
         return (LCZ_row, LCZ_key["name"].iloc[2])
+    else:
+        # if a building does not fall under the classifications provided, the nearest
+        # match would be the LCZ with the highest mean(s). 
+        raise ValueError("LCZ code could not be found as there is no perfect match. \
+                          Implementation of closest LCZ not done (not required but easily possible)")
 
 def between(number: any, range_list: list):
         """Checks if a number is between two values"""
@@ -237,10 +243,8 @@ def main():
                                         build_srf=50, imperv_srf=40, \
                                         perv_srf=25, hgt_rough=6, terr_rough=6)
 
-    # LCZ_code, LCZ_name = ls
-
     print(LCZ_code, LCZ_name)
-    input("Press Enter to exit") # stop console from ending if you run the .py
+    input("Press Enter to exit") # stop console from ending if you run code outside IDE
 
 
 if __name__ == "__main__":
