@@ -113,37 +113,27 @@ class Feature:
         self.dict["geometry"]["coordinates"] = coordlist
     
     def gen_grid(self, extent, x_dist, y_dist):
-        lon_E, lat_S, lon_W, lat_N = extent
-        pointer_lon, pointer_lat = lon_W, lat_N
-
-        print(pointer_lat, lat_S)
-        while pointer_lat >= lat_S:
-            # reset lon pointer
-            pointer_lon = lon_W
-            while pointer_lon <= lon_E:
-                # create point
-                self.add_vertex([pointer_lon, pointer_lat])
-                # increment lon
-                pointer_lon += x_dist
-            # increment lat
-            pointer_lat -= y_dist
+        """Generate"""
+        self.gen_grid_adv(extent, x_dist, y_dist, matrixname="full")
         
     def gen_grid_adv(self, extent, x_dist, y_dist, matrixname="full", matrix=[[]]):
         """
-        Creates a MultiPoint grid.
+        Generate a MultiPoint grid.
         Spacing can fully customized by providing a two-dimensional matrix with
         1/True and 0/False values which will draw/not draw a point respectively.
 
         Lists in matrix should all be of the same length.
-        You can ignore this if you know what you are doing
+        You can ignore this if you know what you are doing.
+        e.G. [[1], [1, 0], [0, 1, 1, 0]] instead of 
+        [1, 1, 1, 1], [1, 0, 1, 0], [0, 1, 1, 0]
         
         Alternatively, a matrixname for the grid can be passed, resulting in a 
         preconfigured grid.
         
         Possible names are: full, checkerboard, big_checkerboard, sparse, sparse_alt, diagonal,
-        raster
+        raster, heart
         """
-        if not matrix:
+        if matrix == [[]]:
             if matrixname == "full":
                 matrix = [[1]]
             elif matrixname == "checkerboard":
@@ -156,12 +146,22 @@ class Feature:
                 matrix = [[0, 0], [0, 1]]
             elif matrixname == "diagonal":
                 matrix = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+            elif matrixname == "diagonal":
+                matrix = [[0, 0, 1], [0, 1, 0], [1, 0, 0]]
             elif matrixname == "raster":
                 matrix = [[1], [1, 0, 0], [1, 0, 0]]
+            elif matrixname == "heart":
+                matrix = [[0, 1, 0, 0, 0, 1, 0, 0], 
+                          [1, 0, 1, 1, 1, 0, 1, 0], 
+                          [1, 0, 0, 0, 0, 0, 1, 0], 
+                          [0, 1, 0, 0, 0, 1, 0, 0], 
+                          [0, 0, 1, 0, 1, 0, 0, 0], 
+                          [0, 0, 0, 1, 0, 0, 0, 0], 
+                          [0]] # you can tell I had fun here :)
+                          # my girlfriend approves, though she`d move matrix[3][1] down by one
             else:
                 raise ValueError("A correct matrix name or matrix must be provided")
-        matlen, rowlen = len(matrix), len(matrix[0])
-
+        matlen = len(matrix)
         # funct start
         lon_E, lat_S, lon_W, lat_N = extent
         pointer_lon, pointer_lat = lon_W, lat_N
@@ -178,7 +178,7 @@ class Feature:
                 # increment lon
                 counter_lon += 1
                 pointer_lon += x_dist
-            # increment lat
+            # decrement lat
             counter_lat += 1
             pointer_lat -= y_dist
         
