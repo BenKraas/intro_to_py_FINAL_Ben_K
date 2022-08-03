@@ -55,32 +55,23 @@ def new_feature(featuretype="MultiPoint", coordinates=[], properties={}):
 
 
 class Feature:
-
-    def __init__(self, type="Point", dictionary={}):
+    """
+    
+    """
+    def __init__(self, featuretype="Point", coordinates=[], properties={}, dictionary={}):
         if dictionary:
             self.dict = dictionary
         else:
-            self.dict = self.PRIVATE_default_dict()
+            self.new(featuretype=featuretype, coordinates=coordinates, properties=properties)
         self.update()
-
-    def PRIVATE_default_dict():
-        """PRIVATE - returns the default dictionary"""
-        return {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-                "type": "Point",
-                "coordinates": []
-            }
-        }
 
     def set(self, dictionary):
         """Brute sets the entire feature dictionary"""
         self.dict = dictionary
         self.update()
     
-    def new(self, featuretype="MultiPoint", coordinates=[], properties={}):
-        """Creates the foundation of a new feature Should be populated"""
+    def new(self, featuretype="Point", coordinates=[], properties={}):
+        """Creates the foundation of a new feature. Should be populated"""
         self.dict = {
             "type": "Feature",
             "properties": properties,
@@ -98,6 +89,16 @@ class Feature:
         return self.dict["geometry"]["coordinates"]
 
     def get_coordinates_raw(self):
+        pass
+
+    def add_vertex(self, coordinates):
+        if self.type == "MultiPoint": insertindex = -1
+        elif self.type == "Polygon" : insertindex = -2
+        
+        self.dict["geometry"]["coordinates"].insert(insertindex, coordinates)
+
+    def gen_randscatter(self, extent, number=10):
+
 
 class GeojsonObject:
     """
