@@ -20,6 +20,7 @@ and I can't have that during development.
 import json
 import math
 from pathlib import Path
+import random
 
 def load_json(path):
     """loads and returns a json dict"""
@@ -94,11 +95,18 @@ class Feature:
     def add_vertex(self, coordinates):
         if self.type == "MultiPoint": insertindex = -1
         elif self.type == "Polygon" : insertindex = -2
-        
+
         self.dict["geometry"]["coordinates"].insert(insertindex, coordinates)
 
     def gen_randscatter(self, extent, number=10):
-
+        """Generates a random scatter MultiPoint"""
+        lon_E, lat_S, lon_W, lat_N = extent
+        coordlist = []
+        for x in range(number):
+            randlon = random.uniform(lon_W, lon_E)
+            randlat = random.uniform(lat_N, lat_S)
+            coordlist.append([randlon, randlat])
+        self.dict["geometry"]["coordinates"] = coordlist
 
 class GeojsonObject:
     """
@@ -120,6 +128,8 @@ class GeojsonObject:
         OR
         it must be populated with loadsample() - a sample dictionary will be loaded
         """
+        if not geojson:
+            geojson = new_geojson()
         self.dict = geojson
         self.dict_path = Path(name).absolute()
 
@@ -145,16 +155,25 @@ class GeojsonObject:
             self.dict_path = pt
         except:
             raise ImportError("Sample geojson not found :(")
-
+        
     def set(self, dictionary):
         """Sets the objects full dictionary to a provided one"""
         self.dict = dictionary
     
+    def set_path(self, path):
+        """Set the dictionarys' path including name"""
+        self.dict_path = Path(path)
+
     # manage data
-    def append(self, featuredict):
-        """Appends the specified featuredict to features"""
-        if featuredict:
-            self.dict["features"].append(featuredict)
+    def append(self, feature):
+        """
+        Appends the specified feature to Geojson features.
+        Can detect the Feature object
+        """
+        if isinstance(feature, dict):
+            self.dict["features"].append(feature)
+        else:
+            self.dict["features"].append(feature.dict)
 
     def wipe(self):
         """Deletes all features from self.dict"""

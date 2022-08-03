@@ -17,9 +17,18 @@ The function should takes as arguments the number of points and
 the bounding box coordinates (lon_E, lat_S, lon_W, lat_N) of the
 geograhical domain.
 """
-def scatter(extent, number):
-    pass
-bk.new_feature()
+lon_E, lat_S, lon_W, lat_N = 90, 20, 20, 40
+
+def gen_randpoint_dict(extent, number):
+    feature = bk.Feature(featuretype="MultiPoint")
+    feature.gen_randscatter(extent, number)
+    mpgobj = bk.GeojsonObject()
+    mpgobj.append(feature)
+    return mpgobj
+
+ftobj = gen_randpoint_dict((lon_E, lat_S, lon_W, lat_N), 200)
+
+print(ftobj.dict)
 
 """
 Subtask 6.2
