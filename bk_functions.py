@@ -13,8 +13,8 @@ I might not specify return values of functions as in
 foo(bar: int) -> not_specified:
     pass
 
-because it messes up syntax highlighting in VSC and 
-I can't have that during development.
+because it completely messes up syntax highlighting in VSC  
+and I can't have that during development.
 """
 
 import json
@@ -54,12 +54,50 @@ def new_feature(featuretype="MultiPoint", coordinates=[], properties={}):
     }
 
 
-class FeatureMultiPoint:
+class Feature:
 
-    def __init__(self):
-        self.dict = 
+    def __init__(self, type="Point", dictionary={}):
+        if dictionary:
+            self.dict = dictionary
+        else:
+            self.dict = self.PRIVATE_default_dict()
+        self.update()
+
+    def PRIVATE_default_dict():
+        """PRIVATE - returns the default dictionary"""
+        return {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "Point",
+                "coordinates": []
+            }
+        }
+
+    def set(self, dictionary):
+        """Brute sets the entire feature dictionary"""
+        self.dict = dictionary
+        self.update()
     
-    def set(self, dict)
+    def new(self, featuretype="MultiPoint", coordinates=[], properties={}):
+        """Creates the foundation of a new feature Should be populated"""
+        self.dict = {
+            "type": "Feature",
+            "properties": properties,
+            "geometry": {
+                "type": featuretype,
+                "coordinates": coordinates
+            }
+        }
+        self.update()
+
+    def update(self):
+        self.type = self.dict["geometry"]["type"]
+
+    def get_coordinates(self):
+        return self.dict["geometry"]["coordinates"]
+
+    def get_coordinates_raw(self):
 
 class GeojsonObject:
     """
