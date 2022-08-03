@@ -156,13 +156,17 @@ class GeojsonObject:
         except:
             raise ImportError("Sample geojson not found :(")
         
-    def set(self, dictionary):
+    def set(self, dictionary: dict):
         """Sets the objects full dictionary to a provided one"""
         self.dict = dictionary
     
-    def set_path(self, path):
+    def set_path(self, path: str):
         """Set the dictionarys' path including name"""
         self.dict_path = Path(path)
+    
+    def set_path_abs(self, abs_path: str):
+        """Set the dictionarys' path including name in working dir"""
+        self.dict_path = Path(abs_path).absolute()
 
     # manage data
     def append(self, feature):

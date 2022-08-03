@@ -28,7 +28,9 @@ def gen_randpoint_dict(extent, number):
 
 ftobj = gen_randpoint_dict((lon_E, lat_S, lon_W, lat_N), 200)
 
-print(ftobj.dict)
+ftobj.set_path("randompoints.geojson")
+
+ftobj.dump()
 
 """
 Subtask 6.2
