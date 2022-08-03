@@ -3,41 +3,13 @@ import bk_functions as bk
 import json
 
 
+gobj = bk.GeojsonObject(bk.new_geojson())
 
-dicti = {
-    "type": "Feature",
-    "properties": {},
-    "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-            [
-                [
-                    -1,
-                    1
-                ],
-                [
-                    1,
-                    1
-                ],
-                [
-                    1,
-                    -1
-                ],
-                [
-                    -1,
-                    -1
-                ],
-                [
-                    -1,
-                    1
-                ]
-            ]
-        ]
-    }
-}
+ft = bk.Feature(featuretype="MultiPoint")
+extent=(90.00252, 20.225, 20.1, 40.3)
+ft.gen_grid_adv(extent, 5.142245, 4.18884, matrixname="checkerboard")
+gobj.append(ft)
 
-gobj = bk.GeojsonObject()
-gobj.loadwd("rivers.geojson")
-print(gobj.calc_total(gobj.calc_length_geod)/1000)
+print(gobj.dict)
 
 

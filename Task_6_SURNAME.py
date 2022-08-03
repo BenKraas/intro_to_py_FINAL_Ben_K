@@ -17,7 +17,8 @@ The function should takes as arguments the number of points and
 the bounding box coordinates (lon_E, lat_S, lon_W, lat_N) of the
 geograhical domain.
 """
-lon_E, lat_S, lon_W, lat_N = 90, 20, 20, 40
+extent  = (90, 20, 20, 40)
+extent2 = (90.00252, 20.225, 20.1, 40.3)
 
 def gen_randpoint_dict(extent, number):
     feature = bk.Feature(featuretype="MultiPoint")
@@ -26,9 +27,9 @@ def gen_randpoint_dict(extent, number):
     mpgobj.append(feature)
     return mpgobj
 
-ftobj = gen_randpoint_dict((lon_E, lat_S, lon_W, lat_N), 200)
+ftobj = gen_randpoint_dict(extent, 200)
 
-ftobj.set_path("randompoints.geojson")
+ftobj.set_path_abs("randompoints.geojson")
 
 ftobj.dump()
 
@@ -43,6 +44,13 @@ The function should take as inputs:
 - the distance between the points in the x- and in the y-dimension.
 - the bounding box coordinates (lon_E, lat_S, lon_W, lat_N) of the
 """
+
+checker_ft = bk.Feature(featuretype="MultiPoint")
+checker_ft.gen_grid_adv(extent, 5, 5, matrixname="checkerboard")
+
+checker_ft_obj = bk.GeojsonObject()
+checker_ft_obj.append(checker_ft)
+checker_ft_obj.dump("checkerboard.geojson")
 
 
 """

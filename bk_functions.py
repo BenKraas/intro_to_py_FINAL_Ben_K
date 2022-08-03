@@ -178,7 +178,7 @@ class Feature:
                 # increment lon
                 counter_lon += 1
                 pointer_lon += x_dist
-            # decrement lat
+            # de lat
             counter_lat += 1
             pointer_lat -= y_dist
         
