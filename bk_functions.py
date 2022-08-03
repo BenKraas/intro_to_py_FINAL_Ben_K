@@ -93,10 +93,14 @@ class Feature:
         pass
 
     def add_vertex(self, coordinates):
-        if self.type == "MultiPoint": insertindex = -1
-        elif self.type == "Polygon" : insertindex = -2
+        ftype = self.dict["geometry"]["type"]
+        if ftype == "MultiPoint": 
+            self.dict["geometry"]["coordinates"].append(coordinates)
+            insertindex = -1
+        elif ftype == "Polygon": 
+            self.dict["geometry"]["coordinates"].insert(-2, coordinates)
 
-        self.dict["geometry"]["coordinates"].insert(insertindex, coordinates)
+        
 
     def gen_randscatter(self, extent, number=10):
         """Generates a random scatter MultiPoint"""
@@ -107,6 +111,77 @@ class Feature:
             randlat = random.uniform(lat_N, lat_S)
             coordlist.append([randlon, randlat])
         self.dict["geometry"]["coordinates"] = coordlist
+    
+    def gen_grid(self, extent, x_dist, y_dist):
+        lon_E, lat_S, lon_W, lat_N = extent
+        pointer_lon, pointer_lat = lon_W, lat_N
+
+        print(pointer_lat, lat_S)
+        while pointer_lat >= lat_S:
+            # reset lon pointer
+            pointer_lon = lon_W
+            while pointer_lon <= lon_E:
+                # create point
+                self.add_vertex([pointer_lon, pointer_lat])
+                # increment lon
+                pointer_lon += x_dist
+            # increment lat
+            pointer_lat -= y_dist
+        
+    def gen_grid_adv(self, extent, x_dist, y_dist, matrixname="full", matrix=[[]]):
+        """
+        Creates a MultiPoint grid.
+        Spacing can fully customized by providing a two-dimensional matrix with
+        1/True and 0/False values which will draw/not draw a point respectively.
+
+        Lists in matrix should all be of the same length.
+        You can ignore this if you know what you are doing
+        
+        Alternatively, a matrixname for the grid can be passed, resulting in a 
+        preconfigured grid.
+        
+        Possible names are: full, checkerboard, big_checkerboard, sparse, sparse_alt, diagonal,
+        raster
+        """
+        if not matrix:
+            if matrixname == "full":
+                matrix = [[1]]
+            elif matrixname == "checkerboard":
+                matrix = [[1, 0], [0, 1]]
+            elif matrixname == "big_checkerboard":
+                matrix = [[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 1, 1], [0, 0, 1, 1]]
+            elif matrixname == "sparse":
+                matrix = [[1, 0], [0, 0]]
+            elif matrixname == "sparse_alt":
+                matrix = [[0, 0], [0, 1]]
+            elif matrixname == "diagonal":
+                matrix = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+            elif matrixname == "raster":
+                matrix = [[1], [1, 0, 0], [1, 0, 0]]
+            else:
+                raise ValueError("A correct matrix name or matrix must be provided")
+        matlen, rowlen = len(matrix), len(matrix[0])
+
+        # funct start
+        lon_E, lat_S, lon_W, lat_N = extent
+        pointer_lon, pointer_lat = lon_W, lat_N
+        counter_lon, counter_lat = 0, 0
+        while pointer_lat >= lat_S:
+            # reset lon pointer
+            matline = matrix[(counter_lat%matlen)]
+            counter_lon, pointer_lon = 0, lon_W
+            while pointer_lon <= lon_E:
+                # create point
+                matnum = matline[(counter_lon%len(matrix[counter_lat%matlen]))]
+                if matnum:
+                    self.add_vertex([pointer_lon, pointer_lat])
+                # increment lon
+                counter_lon += 1
+                pointer_lon += x_dist
+            # increment lat
+            counter_lat += 1
+            pointer_lat -= y_dist
+        
 
 class GeojsonObject:
     """
@@ -116,7 +191,7 @@ class GeojsonObject:
     Author: Ben Kraas (https://github.com/KtRNofficial)
     """
 
-    def __init__(self, geojson={}, name="default.geojson"):
+    def __init__(self, geojson: dict={}, name: str="default.geojson"):
         """
         Initializes the GeojsonObject
 
@@ -172,7 +247,7 @@ class GeojsonObject:
     def append(self, feature):
         """
         Appends the specified feature to Geojson features.
-        Can detect the Feature object
+        Can accept the Feature object
         """
         if isinstance(feature, dict):
             self.dict["features"].append(feature)
@@ -201,7 +276,7 @@ class GeojsonObject:
         self.dumpto(newname)
 
     # get feature information
-    def get_name(self, id):
+    def get_name(self, id: int):
         """Returns a features name from ID"""
         return self.dict["features"][id]["properties"]["name"]
 
@@ -212,7 +287,7 @@ class GeojsonObject:
             name_list.append(feature["properties"]["name"])
         return name_list
 
-    def get_type(self, id):
+    def get_type(self, id: int):
         """Returns a features type from ID"""
         return self.dict["features"][id]["geometry"]["type"]
 
@@ -232,7 +307,7 @@ class GeojsonObject:
             return False
         return True
 
-    def get_feature(self, id):
+    def get_feature(self, id: int):
         """Returns a feature dictionary by feature ID"""
         if id is not None:
             return self.dict["features"][id]
@@ -252,7 +327,7 @@ class GeojsonObject:
         if id is not None and property:
             return self.dict["features"][id]["properties"].get(property)
         
-    def get_properties(self, id):
+    def get_properties(self, id: int):
         if id is not None:
             return self.dict["features"][id]["properties"]
         raise ValueError(f"Properties for ID {id} is not accessible")
@@ -353,7 +428,6 @@ class GeojsonObject:
         if inplace:
             self.wipe()
             self.dict["features"].append(new_feature(featuretype="MultiPoint", coordinates=finalls))
-            # self.dict["features"][0]["geometry"]["coordinates"] = finalls
 
         else:
             retdict = self.dict
