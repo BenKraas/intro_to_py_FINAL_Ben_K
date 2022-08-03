@@ -53,6 +53,14 @@ def new_feature(featuretype="MultiPoint", coordinates=[], properties={}):
         }
     }
 
+
+class FeatureMultiPoint:
+
+    def __init__(self):
+        self.dict = 
+    
+    def set(self, dict)
+
 class GeojsonObject:
     """
     This class introduces an object-based approach to geojson handling.
@@ -76,6 +84,7 @@ class GeojsonObject:
         self.dict = geojson
         self.dict_path = Path(name).absolute()
 
+    # load data into object
     def loadwd(self, path: object):
         """
         Loads a geosjon dict from working directory.
@@ -98,6 +107,25 @@ class GeojsonObject:
         except:
             raise ImportError("Sample geojson not found :(")
 
+    def set(self, dictionary):
+        """Sets the objects full dictionary to a provided one"""
+        self.dict = dictionary
+    
+    # manage data
+    def append(self, featuredict):
+        """Appends the specified featuredict to features"""
+        if featuredict:
+            self.dict["features"].append(featuredict)
+
+    def wipe(self):
+        """Deletes all features from self.dict"""
+        self.dict["features"] = []
+    
+    def clear(self):
+        """Deletes all features from self.dict"""
+        self.wipe() # is this function unnecessary and bad practice? Yes. I like both wipe and clear though
+
+    # save data
     def dumpto(self, path: object):
         with open(path, "w") as fp:
             # use indent=4 to make json more readable
@@ -110,6 +138,7 @@ class GeojsonObject:
             newname = Path("edited_" + self.dict_path.name).absolute()
         self.dumpto(newname)
 
+    # get feature information
     def get_name(self, id):
         """Returns a features name from ID"""
         return self.dict["features"][id]["properties"]["name"]
@@ -166,6 +195,7 @@ class GeojsonObject:
             return self.dict["features"][id]["properties"]
         raise ValueError(f"Properties for ID {id} is not accessible")
     
+    # querys/searches
     def query_name(self, searchname, casesensitive=False):
         """
         Search the geojson for a searchname. 
@@ -200,6 +230,7 @@ class GeojsonObject:
             propls.append(self.get_property(id, propertyname))
         return propls
 
+    # more advanced calculations (quite project specific)
     def calc_total(self, function):
         """
         Calculate a total value by running the passed function for every feature 
@@ -243,19 +274,7 @@ class GeojsonObject:
         # are laid out
         return self.calc_circumference_geod(id)
 
-    def append(self, featuredict):
-        """Appends the specified featuredict to features"""
-        if featuredict:
-            self.dict["features"].append(featuredict)
-
-    def wipe(self):
-        """Deletes all features from self.dict"""
-        self.dict["features"] = []
-    
-    def clear(self):
-        """Deletes all features from self.dict"""
-        self.wipe() # is this function unnecessary and bad practice? Yes. I like both wipe and clear though
-
+    # type conversions
     def convert_to_multipoint(self, inplace=False):
         """This function converts all polygons in a geojson to a single MultiPoint feature"""
         types = self.get_types()
