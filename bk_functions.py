@@ -15,6 +15,8 @@ foo(bar: int) -> not_specified:
 
 because it completely messes up syntax highlighting in VSC  
 and I can't have that during development.
+
+Edit: Syntax highlighting fixed, I hope I don't miss any return values
 """
 
 import json
@@ -113,10 +115,10 @@ class Feature:
         self.dict["geometry"]["coordinates"] = coordlist
     
     def gen_grid(self, extent, x_dist, y_dist):
-        """Generate"""
+        """Generate a normal point grid"""
         self.gen_grid_adv(extent, x_dist, y_dist, matrixname="full")
         
-    def gen_grid_adv(self, extent, x_dist, y_dist, matrixname="full", matrix=[[]]):
+    def gen_grid_adv(self, extent, x_dist, y_dist, matrixname="full", matrix=None):
         """
         Generate a MultiPoint grid.
         Spacing can fully customized by providing a two-dimensional matrix with
@@ -133,36 +135,11 @@ class Feature:
         Possible names are: full, checkerboard, big_checkerboard, sparse, sparse_alt, diagonal,
         raster, heart
         """
-        if matrix == [[]]:
-            if matrixname == "full":
-                matrix = [[1]]
-            elif matrixname == "checkerboard":
-                matrix = [[1, 0], [0, 1]]
-            elif matrixname == "big_checkerboard":
-                matrix = [[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 1, 1], [0, 0, 1, 1]]
-            elif matrixname == "sparse":
-                matrix = [[1, 0], [0, 0]]
-            elif matrixname == "sparse_alt":
-                matrix = [[0, 0], [0, 1]]
-            elif matrixname == "diagonal":
-                matrix = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
-            elif matrixname == "diagonal":
-                matrix = [[0, 0, 1], [0, 1, 0], [1, 0, 0]]
-            elif matrixname == "raster":
-                matrix = [[1], [1, 0, 0], [1, 0, 0]]
-            elif matrixname == "heart":
-                matrix = [[0, 1, 0, 0, 0, 1, 0, 0], 
-                          [1, 0, 1, 1, 1, 0, 1, 0], 
-                          [1, 0, 0, 0, 0, 0, 1, 0], 
-                          [0, 1, 0, 0, 0, 1, 0, 0], 
-                          [0, 0, 1, 0, 1, 0, 0, 0], 
-                          [0, 0, 0, 1, 0, 0, 0, 0], 
-                          [0]] # you can tell I had fun here :)
-                          # my girlfriend approves, though she`d move matrix[3][1] down by one
-            else:
-                raise ValueError("A correct matrix name or matrix must be provided")
-        matlen = len(matrix)
+        if matrix == None and matrixname:
+            matrix = self.PRIVATE_resolve_matrix(matrixname)
+        
         # funct start
+        matlen = len(matrix)
         lon_E, lat_S, lon_W, lat_N = extent
         pointer_lon, pointer_lat = lon_W, lat_N
         counter_lon, counter_lat = 0, 0
@@ -174,14 +151,83 @@ class Feature:
                 # create point
                 matnum = matline[(counter_lon%len(matrix[counter_lat%matlen]))]
                 if matnum:
+                    # print([counter_lon, counter_lat, matnum, matline, pointer_lon, pointer_lat])
                     self.add_vertex([pointer_lon, pointer_lat])
                 # increment lon
                 counter_lon += 1
                 pointer_lon += x_dist
-            # de lat
+            # decrement lat
             counter_lat += 1
             pointer_lat -= y_dist
+
+    def gen_grid_adv2():
+        pass
+
+    def PRIVATE_resolve_matrix(self, matrixname):
+        if matrixname == "full":
+            matrix = [[1]]
+        elif matrixname == "checkerboard":
+            matrix = [[1, 0], [0, 1]]
+        elif matrixname == "big_checkerboard":
+            matrix = [[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 1, 1], [0, 0, 1, 1]]
+        elif matrixname == "sparse":
+            matrix = [[1, 0], [0, 0]]
+        elif matrixname == "sparse_alt":
+            matrix = [[0, 0], [0, 1]]
+        elif matrixname == "diagonal":
+            matrix = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+        elif matrixname == "diagonal":
+            matrix = [[0, 0, 1], [0, 1, 0], [1, 0, 0]]
+        elif matrixname == "raster":
+            matrix = [[1], [1, 0, 0], [1, 0, 0]]
+        elif matrixname == "heart":
+            matrix = [[0, 1, 0, 0, 0, 1, 0, 0], 
+                          [1, 0, 1, 1, 1, 0, 1, 0], 
+                          [1, 0, 0, 0, 0, 0, 1, 0], 
+                          [0, 1, 0, 0, 0, 1, 0, 0], 
+                          [0, 0, 1, 0, 1, 0, 0, 0], 
+                          [0, 0, 0, 1, 0, 0, 0, 0], 
+                          [0]] # you can tell I had fun here :)
+                          # my girlfriend approves, though she`d move matrix[3][1] down by one
+        else:
+            raise ValueError("A correct matrix name or matrix must be provided")
+        return matrix
         
+
+    def offset_circular(self, offset, offset_fixed=False, inplace=False):
+        """
+        Randomly offsets a MultiPoint feature classes points
+        by any random value in a circle around the origin.
+        Maximum distance is specified by the offset
+        If offset_fixed is True, it will put the points on the circumference instead
+        """
+        if not self.dict["geometry"]["type"] == "MultiPoint":
+            raise ValueError("Method can only handle multipoint features for now")
+        
+        coord_collection = []
+        for point in self.dict["geometry"]["coordinates"]:
+            j, k = point # circle's origin
+
+            if offset_fixed: amount = 1
+            else: amount = random.random()
+
+            t = random.uniform(0, 360)
+            x, y = self.PRIVATE_draw_circle(offset, t, j, k, inwards_variation=amount)
+            coord_collection.append([x, y])
+        
+        if inplace:
+            self.dict["geometry"]["coordinates"] = coord_collection
+        else:
+           return Feature("MultiPoint", coord_collection)
+
+    def PRIVATE_draw_circle(self, offset, radian, origin_x, origin_y, inwards_variation):
+        
+        x = (offset*inwards_variation) * math.cos(radian) + origin_x
+        y = (offset*inwards_variation) * math.sin(radian) + origin_y
+        return x, y
+
+           
+            
 
 class GeojsonObject:
     """

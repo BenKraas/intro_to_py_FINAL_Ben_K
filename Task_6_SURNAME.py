@@ -7,7 +7,7 @@ Final Project - TASK 6
 ======================
 """
 import bk_functions as bk
-
+import math
 """
 Subtask 6.1
 -----------
@@ -17,7 +17,7 @@ The function should takes as arguments the number of points and
 the bounding box coordinates (lon_E, lat_S, lon_W, lat_N) of the
 geograhical domain.
 """
-extent  = (90, 20, 20, 40)
+extent  = (90, 20, 70, 40)
 extent2 = (90.00252, 20.225, 20.1, 40.3)
 
 def gen_randpoint_dict(extent, number):
@@ -72,3 +72,18 @@ The function should take as inputs:
 
 Hint: Check the material of L6.
 """
+
+def random_grid(extent, grid_spacing_x, grid_spacing_y, shift, offset_fixed=False, iterations=1) -> bk.GeojsonObject:
+    shift_ft = bk.Feature(featuretype="MultiPoint")
+    shift_ft.gen_grid(extent, grid_spacing_x, grid_spacing_y)
+
+    shift_ft_obj = bk.GeojsonObject()
+    # shift_ft_obj.append(shift_ft)
+    for iter in range(iterations):
+        shift_ft_obj.append(shift_ft.offset_circular(shift, offset_fixed=offset_fixed))
+
+    return shift_ft_obj
+    
+
+shift_ft_obj = random_grid(extent, 5, 5, 1, offset_fixed=False, iterations=50)
+shift_ft_obj.dump("offset_dict.geojson")
