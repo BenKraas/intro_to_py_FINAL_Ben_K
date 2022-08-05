@@ -218,7 +218,7 @@ class Feature:
         If offset_fixed is True, it will put the points on the circumference instead
 
         This scatter method does not scatter evenly - density will increase towards the center.
-        An alternative method is WIP
+        If this is not desired, use self.offset_circular_even()
         """
         if not self.dict["geometry"]["type"] == "MultiPoint":
             raise ValueError("Method can only handle multipoint features for now")
@@ -240,7 +240,10 @@ class Feature:
            return Feature("MultiPoint", coord_collection)
 
     def offset_circular_even(self, offset: float, inplace: bool=False) -> object:
-        """Alternative scattering method. WIP and not functional yet"""
+        """
+        Superiour scattering method. 
+        Scattering is even across the entire circular area
+        """
         # code should scatter randomly on a square and then keep only the points inside a circle
 
         if not self.dict["geometry"]["type"] == "MultiPoint":

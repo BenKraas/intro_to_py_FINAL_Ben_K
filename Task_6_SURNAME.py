@@ -74,15 +74,17 @@ The function should take as inputs:
 Hint: Check the material of L6.
 """
 
-def random_grid(extent, grid_spacing_x, grid_spacing_y, shift, offset_fixed=False, iterations=1) -> bk.GeojsonObject:
+def random_grid(extent, grid_spacing_x, grid_spacing_y, shift, \
+                offset_fixed=False, iterations=1) -> bk.GeojsonObject:
+    
     shift_ft = bk.Feature(featuretype="MultiPoint")
     shift_ft.gen_grid(extent, grid_spacing_x, grid_spacing_y)
-
     shift_ft_obj = bk.GeojsonObject()
     for foo in range(iterations):
-        shift_ft_obj.append(shift_ft.offset_circular_even(shift)) # , offset_fixed=offset_fixed
+        shift_ft_obj.append(shift_ft.offset_circular_even(shift))
 
     return shift_ft_obj
-    
-shift_ft_obj = random_grid(extent, 20, 20, 1, offset_fixed=False, iterations=100)
+
+extent  = (90, 20, 80, 30)
+shift_ft_obj = random_grid(extent, 11, 11, 1, offset_fixed=False, iterations=1000)
 shift_ft_obj.dump("offset_dict.geojson")
