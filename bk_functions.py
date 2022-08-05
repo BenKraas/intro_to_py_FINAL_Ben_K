@@ -24,28 +24,28 @@ import math
 from pathlib import Path
 import random
 
-def load_json(path):
+def load_json(path: Path) -> dict:
     """loads and returns a json dict"""
     with open(path) as json_file:
         data = json.load(json_file)
     return data
 
-def beautydump(jsondict: dict, savepath):
+def beautydump(jsondict: dict, savepath: Path):
     with open(savepath, "w") as f:
         json.dump(jsondict, f, indent=4)
 
-def dump(jsondict: dict, savepath):
+def dump(jsondict: dict, savepath: Path):
     with open(savepath, "w") as f:
         json.dump(jsondict, f)
 
-def new_geojson():
+def new_geojson() -> dict:
     """Return the structure of a geojson dictionary"""
     return {
         "type": "FeatureCollection",
         "features": []
     }
 
-def new_feature(featuretype="MultiPoint", coordinates=[], properties={}):
+def new_feature(featuretype="MultiPoint", coordinates=[], properties={}) -> dict:
     """Returns the structure of a single Feature. Should be populated"""
     return {
         "type": "Feature",
@@ -61,19 +61,21 @@ class Feature:
     """
     
     """
-    def __init__(self, featuretype="Point", coordinates=[], properties={}, dictionary={}):
+    def __init__(self, featuretype: str="Point", coordinates: list=[], \
+                 properties: dict={}, dictionary: dict={}):
         if dictionary:
             self.dict = dictionary
         else:
-            self.new(featuretype=featuretype, coordinates=coordinates, properties=properties)
+            self.new(featuretype, coordinates, properties)
         self.update()
 
-    def set(self, dictionary):
+    def force(self, dictionary: dict):
         """Brute sets the entire feature dictionary"""
         self.dict = dictionary
         self.update()
     
-    def new(self, featuretype="Point", coordinates=[], properties={}):
+    def new(self, featuretype: str="Point", coordinates: list=[], \
+            properties: dict={}):
         """Creates the foundation of a new feature. Should be populated"""
         self.dict = {
             "type": "Feature",
@@ -88,23 +90,27 @@ class Feature:
     def update(self):
         self.type = self.dict["geometry"]["type"]
 
-    def get_coordinates(self):
+    def get_coordinates(self) -> list:
+        """Returns the Feaature's coordinate list"""
         return self.dict["geometry"]["coordinates"]
 
     def get_coordinates_raw(self):
+        """WIP"""
         pass
 
-    def add_vertex(self, coordinates):
+    def add_vertex(self, coordinates: list):
+        """
+        Add a vertex to the coordinate list. 
+        Currently only supports MultiPoints and Polygons
+        WIP
+        """
         ftype = self.dict["geometry"]["type"]
         if ftype == "MultiPoint": 
             self.dict["geometry"]["coordinates"].append(coordinates)
-            insertindex = -1
         elif ftype == "Polygon": 
             self.dict["geometry"]["coordinates"].insert(-2, coordinates)
 
-        
-
-    def gen_randscatter(self, extent, number=10):
+    def gen_randscatter(self, extent: list, number: int=10):
         """Generates a random scatter MultiPoint"""
         lon_E, lat_S, lon_W, lat_N = extent
         coordlist = []
@@ -114,11 +120,12 @@ class Feature:
             coordlist.append([randlon, randlat])
         self.dict["geometry"]["coordinates"] = coordlist
     
-    def gen_grid(self, extent, x_dist, y_dist):
+    def gen_grid(self, extent: list, x_dist: float, y_dist: float):
         """Generate a normal point grid"""
         self.gen_grid_adv(extent, x_dist, y_dist, matrixname="full")
         
-    def gen_grid_adv(self, extent, x_dist, y_dist, matrixname="full", matrix=None):
+    def gen_grid_adv(self, extent: list, x_dist: float, y_dist: float, \
+                     matrixname: str="full", matrix: list=None):
         """
         Generate a MultiPoint grid.
         Spacing can fully customized by providing a two-dimensional matrix with
@@ -160,10 +167,7 @@ class Feature:
             counter_lat += 1
             pointer_lat -= y_dist
 
-    def gen_grid_adv2():
-        pass
-
-    def PRIVATE_resolve_matrix(self, matrixname):
+    def PRIVATE_resolve_matrix(self, matrixname: str) -> list:
         if matrixname == "full":
             matrix = [[1]]
         elif matrixname == "checkerboard":
@@ -182,19 +186,20 @@ class Feature:
             matrix = [[1], [1, 0, 0], [1, 0, 0]]
         elif matrixname == "heart":
             matrix = [[0, 1, 0, 0, 0, 1, 0, 0], 
-                          [1, 0, 1, 1, 1, 0, 1, 0], 
-                          [1, 0, 0, 0, 0, 0, 1, 0], 
-                          [0, 1, 0, 0, 0, 1, 0, 0], 
-                          [0, 0, 1, 0, 1, 0, 0, 0], 
-                          [0, 0, 0, 1, 0, 0, 0, 0], 
-                          [0]] # you can tell I had fun here :)
+                      [1, 0, 1, 1, 1, 0, 1, 0], 
+                      [1, 0, 0, 0, 0, 0, 1, 0], 
+                      [0, 1, 0, 0, 0, 1, 0, 0], 
+                      [0, 0, 1, 0, 1, 0, 0, 0], 
+                      [0, 0, 0, 1, 0, 0, 0, 0], 
+                      [0]] 
+                          # you can tell I had fun here :)
                           # my girlfriend approves, though she`d move matrix[3][1] down by one
         else:
             raise ValueError("A correct matrix name or matrix must be provided")
         return matrix
         
 
-    def offset_circular(self, offset, offset_fixed=False, inplace=False):
+    def offset_circular(self, offset: float, offset_fixed: bool=False, inplace: bool=False) -> object:
         """
         Randomly offsets a MultiPoint feature classes points
         by any random value in a circle around the origin.
@@ -220,14 +225,17 @@ class Feature:
         else:
            return Feature("MultiPoint", coord_collection)
 
-    def PRIVATE_draw_circle(self, offset, radian, origin_x, origin_y, inwards_variation):
-        
+    def PRIVATE_draw_circle(self, offset: float, radian: float, origin_x: float, \
+                            origin_y: float, inwards_variation: float) -> list:
+        """
+        Draws a point on a circle's circumference around a point
+        or (if inwards_variation > 0) within.
+        Radian defines at how many degrees the point is placed
+        """
         x = (offset*inwards_variation) * math.cos(radian) + origin_x
         y = (offset*inwards_variation) * math.sin(radian) + origin_y
-        return x, y
+        return [x, y]
 
-           
-            
 
 class GeojsonObject:
     """
@@ -277,7 +285,7 @@ class GeojsonObject:
         except:
             raise ImportError("Sample geojson not found :(")
         
-    def set(self, dictionary: dict):
+    def force(self, dictionary: dict):
         """Sets the objects full dictionary to a provided one"""
         self.dict = dictionary
     
@@ -293,7 +301,7 @@ class GeojsonObject:
     def append(self, feature):
         """
         Appends the specified feature to Geojson features.
-        Can accept the Feature object
+        Can accept the Feature object or a feature dict
         """
         if isinstance(feature, dict):
             self.dict["features"].append(feature)
@@ -309,12 +317,12 @@ class GeojsonObject:
         self.wipe() # is this function unnecessary and bad practice? Yes. I like both wipe and clear though
 
     # save data
-    def dumpto(self, path: object):
+    def dumpto(self, path: Path):
         with open(path, "w") as fp:
             # use indent=4 to make json more readable
             json.dump(self.dict, fp, indent=4)
         
-    def dump(self, name=None):
+    def dump(self, name: str=None):
         if name:
             newname = Path(name).absolute()
         else:
@@ -322,22 +330,22 @@ class GeojsonObject:
         self.dumpto(newname)
 
     # get feature information
-    def get_name(self, id: int):
+    def get_name(self, id: int) -> str:
         """Returns a features name from ID"""
         return self.dict["features"][id]["properties"]["name"]
 
-    def get_names(self):
+    def get_names(self) -> list:
         """Returns all feature names"""
         name_list = []
         for feature in self.dict["features"]:
             name_list.append(feature["properties"]["name"])
         return name_list
 
-    def get_type(self, id: int):
+    def get_type(self, id: int) -> str:
         """Returns a features type from ID"""
         return self.dict["features"][id]["geometry"]["type"]
 
-    def get_types(self):
+    def get_types(self) -> set:
         """Returns all feature types that occurr in the geojson"""
         type_set = set()
         for feature in self.dict["features"]:
@@ -346,14 +354,14 @@ class GeojsonObject:
             return False
         return type_set
 
-    def get_all_same_type(self):
+    def get_all_same_type(self) -> bool:
         """Returns type if all features are of the same type and False if not"""
         types = self.get_types()
         if len(types) > 1:
             return False
         return True
 
-    def get_feature(self, id: int):
+    def get_feature(self, id: int) -> dict:
         """Returns a feature dictionary by feature ID"""
         if id is not None:
             return self.dict["features"][id]

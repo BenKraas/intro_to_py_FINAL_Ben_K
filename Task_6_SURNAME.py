@@ -44,13 +44,14 @@ The function should take as inputs:
 - the distance between the points in the x- and in the y-dimension.
 - the bounding box coordinates (lon_E, lat_S, lon_W, lat_N) of the
 """
+def create_checkerboard(extent, dist_x, dist_y) -> bk.Feature:
+    checker_ft = bk.Feature(featuretype="MultiPoint")
+    checker_ft.gen_grid_adv(extent, dist_x, dist_y, matrixname="checkerboard")
+    return checker_ft
 
-checker_ft = bk.Feature(featuretype="MultiPoint")
-checker_ft.gen_grid_adv(extent, 5, 5, matrixname="checkerboard")
-
-checker_ft_obj = bk.GeojsonObject()
-checker_ft_obj.append(checker_ft)
-checker_ft_obj.dump("checkerboard.geojson")
+gobj = bk.GeojsonObject()
+gobj.append(create_checkerboard(extent, 1, 1))
+gobj.dump("checkerboard.geojson")
 
 
 """
@@ -78,12 +79,10 @@ def random_grid(extent, grid_spacing_x, grid_spacing_y, shift, offset_fixed=Fals
     shift_ft.gen_grid(extent, grid_spacing_x, grid_spacing_y)
 
     shift_ft_obj = bk.GeojsonObject()
-    # shift_ft_obj.append(shift_ft)
-    for iter in range(iterations):
+    for foo in range(iterations):
         shift_ft_obj.append(shift_ft.offset_circular(shift, offset_fixed=offset_fixed))
 
     return shift_ft_obj
     
-
 shift_ft_obj = random_grid(extent, 5, 5, 1, offset_fixed=False, iterations=50)
 shift_ft_obj.dump("offset_dict.geojson")
