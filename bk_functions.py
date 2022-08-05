@@ -47,8 +47,10 @@ def new_geojson() -> dict:
         "features": []
     }
 
-def new_feature(featuretype="MultiPoint", coordinates=[], properties={}) -> dict:
+def new_feature(featuretype="MultiPoint", coordinates=None, properties=None) -> dict:
     """Returns the structure of a single Feature. Should be populated"""
+    if coordinates is None: coordinates=[]
+    if properties is None: properties={}
     return {
         "type": "Feature",
         "properties": properties,
@@ -63,8 +65,12 @@ class Feature:
     """
     
     """
-    def __init__(self, featuretype: str="Point", coordinates: list=[], \
-                 properties: dict={}, dictionary: dict={}):
+    def __init__(self, featuretype: str="Point", coordinates: list=None, \
+                 properties: dict=None, dictionary: dict=None):
+        if coordinates is None: coordinates=[] # solve mutable default args
+        if properties is None: properties={}
+        if dictionary is None: dictionary={}
+
         if dictionary:
             self.dict = dictionary
         else:
@@ -76,9 +82,12 @@ class Feature:
         self.dict = dictionary
         self.update()
     
-    def new(self, featuretype: str="Point", coordinates: list=[], \
-            properties: dict={}):
+    def new(self, featuretype: str="Point", coordinates: list=None, \
+            properties: dict=None):
         """Creates the foundation of a new feature. Should be populated"""
+        if coordinates is None: coordinates=[] # solve mutable default args
+        if properties is None: properties={}
+
         self.dict = {
             "type": "Feature",
             "properties": properties,
@@ -144,8 +153,8 @@ class Feature:
         raster
         """
         if matrix == None and matrixname:
-            matrix = self.__resolve_matrix(matrixname)
-        
+            matrix = self.PRIVATE_resolve_matrix(matrixname)
+        print(matrix)
         # funct start
         matlen = len(matrix)
         lon_E, lat_S, lon_W, lat_N = extent
@@ -168,7 +177,7 @@ class Feature:
             counter_lat += 1
             pointer_lat -= y_dist
 
-    def __resolve_matrix(self, matrixname: str) -> list:
+    def PRIVATE_resolve_matrix(self, matrixname: str) -> list:
         """Private function. Provides example matrices to self.gen_grid_adv()"""
         if matrixname == "full":
             matrix = [[1]]
@@ -280,7 +289,7 @@ class GeojsonObject:
     Author: Ben Kraas (https://github.com/KtRNofficial)
     """
 
-    def __init__(self, geojson: dict={}, name: str="default.geojson"):
+    def __init__(self, geojson: dict=None, name: str="default.geojson"):
         """
         Initializes the GeojsonObject
 
@@ -292,6 +301,7 @@ class GeojsonObject:
         OR
         it must be populated with loadsample() - a sample dictionary will be loaded
         """
+        if geojson is None: geojson={} # solve mutable default args
         if not geojson:
             geojson = new_geojson()
         self.dict = geojson
