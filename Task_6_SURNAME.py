@@ -80,9 +80,9 @@ def random_grid(extent, grid_spacing_x, grid_spacing_y, shift, offset_fixed=Fals
 
     shift_ft_obj = bk.GeojsonObject()
     for foo in range(iterations):
-        shift_ft_obj.append(shift_ft.offset_circular(shift, offset_fixed=offset_fixed))
+        shift_ft_obj.append(shift_ft.offset_circular_even(shift)) # , offset_fixed=offset_fixed
 
     return shift_ft_obj
     
-shift_ft_obj = random_grid(extent, 5, 5, 1, offset_fixed=False, iterations=50)
+shift_ft_obj = random_grid(extent, 20, 20, 1, offset_fixed=False, iterations=100)
 shift_ft_obj.dump("offset_dict.geojson")

@@ -24,6 +24,8 @@ import math
 from pathlib import Path
 import random
 
+from numpy import float16
+
 def load_json(path: Path) -> dict:
     """loads and returns a json dict"""
     with open(path) as json_file:
@@ -133,17 +135,16 @@ class Feature:
 
         Lists in matrix should all be of the same length.
         You can ignore this if you know what you are doing.
-        e.G. [[1], [1, 0], [0, 1, 1, 0]] instead of 
-        [1, 1, 1, 1], [1, 0, 1, 0], [0, 1, 1, 0]
+        e.g. [[1], [1, 0], [0, 1, 1, 0]] instead of 
+        [[1, 1, 1, 1], [1, 0, 1, 0], [0, 1, 1, 0]]
         
-        Alternatively, a matrixname for the grid can be passed, resulting in a 
-        preconfigured grid.
-        
-        Possible names are: full, checkerboard, big_checkerboard, sparse, sparse_alt, diagonal,
-        raster, heart
+        Alternatively, a matrixname for the grid can be passed which builds on a number of
+        prebuilt matrices
+        Possible matrixnames are: full, checkerboard, big_checkerboard, sparse, sparse_alt, diagonal,
+        raster
         """
         if matrix == None and matrixname:
-            matrix = self.PRIVATE_resolve_matrix(matrixname)
+            matrix = self.__resolve_matrix(matrixname)
         
         # funct start
         matlen = len(matrix)
@@ -167,7 +168,8 @@ class Feature:
             counter_lat += 1
             pointer_lat -= y_dist
 
-    def PRIVATE_resolve_matrix(self, matrixname: str) -> list:
+    def __resolve_matrix(self, matrixname: str) -> list:
+        """Private function. Provides example matrices to self.gen_grid_adv()"""
         if matrixname == "full":
             matrix = [[1]]
         elif matrixname == "checkerboard":
@@ -184,7 +186,7 @@ class Feature:
             matrix = [[0, 0, 1], [0, 1, 0], [1, 0, 0]]
         elif matrixname == "raster":
             matrix = [[1], [1, 0, 0], [1, 0, 0]]
-        elif matrixname == "heart":
+        elif matrixname == "heart": # easter egg
             matrix = [[0, 1, 0, 0, 0, 1, 0, 0], 
                       [1, 0, 1, 1, 1, 0, 1, 0], 
                       [1, 0, 0, 0, 0, 0, 1, 0], 
@@ -192,8 +194,8 @@ class Feature:
                       [0, 0, 1, 0, 1, 0, 0, 0], 
                       [0, 0, 0, 1, 0, 0, 0, 0], 
                       [0]] 
-                          # you can tell I had fun here :)
-                          # my girlfriend approves, though she`d move matrix[3][1] down by one
+                      # you can tell I had fun here :)
+                      # my girlfriend approves, though she`d move matrix[3][1] down by one
         else:
             raise ValueError("A correct matrix name or matrix must be provided")
         return matrix
@@ -202,9 +204,12 @@ class Feature:
     def offset_circular(self, offset: float, offset_fixed: bool=False, inplace: bool=False) -> object:
         """
         Randomly offsets a MultiPoint feature classes points
-        by any random value in a circle around the origin.
+        by any random value in a circle around the origin (offset == radius).
         Maximum distance is specified by the offset
         If offset_fixed is True, it will put the points on the circumference instead
+
+        This scatter method does not scatter evenly - density will increase towards the center.
+        An alternative method is WIP
         """
         if not self.dict["geometry"]["type"] == "MultiPoint":
             raise ValueError("Method can only handle multipoint features for now")
@@ -213,11 +218,11 @@ class Feature:
         for point in self.dict["geometry"]["coordinates"]:
             j, k = point # circle's origin
 
-            if offset_fixed: amount = 1
-            else: amount = random.random()
+            if offset_fixed: vari = 1       # no variation towards circles' center
+            else: vari = random.random()    # random variation ranging from 1 (none) to 0 (full)
 
             t = random.uniform(0, 360)
-            x, y = self.PRIVATE_draw_circle(offset, t, j, k, inwards_variation=amount)
+            x, y = self.__draw_circle(offset, t, j, k, inwards_variation=vari)
             coord_collection.append([x, y])
         
         if inplace:
@@ -225,7 +230,33 @@ class Feature:
         else:
            return Feature("MultiPoint", coord_collection)
 
-    def PRIVATE_draw_circle(self, offset: float, radian: float, origin_x: float, \
+    def offset_circular_even(self, offset: float, inplace: bool=False) -> object:
+        """Alternative scattering method. WIP and not functional yet"""
+        # code should scatter randomly on a square and then keep only the points inside a circle
+
+        if not self.dict["geometry"]["type"] == "MultiPoint":
+            raise ValueError("Method can only handle multipoint features for now")
+        
+        coord_collection = []
+        for point in self.dict["geometry"]["coordinates"]:
+            x_origin, y_origin = point # circle's origin
+
+            while True:
+                x_scatter = random.uniform((x_origin - offset), (x_origin + offset))
+                y_scatter = random.uniform((y_origin - offset), (y_origin + offset))
+
+                check_val = math.sqrt( pow((x_scatter-x_origin), 2) + pow((y_scatter-y_origin), 2) )
+
+                if check_val <= offset:
+                    coord_collection.append([x_scatter, y_scatter])
+                    break
+        
+        if inplace:
+            self.dict["geometry"]["coordinates"] = coord_collection
+        else:
+           return Feature("MultiPoint", coord_collection)
+
+    def __draw_circle(self, offset: float, radian: float, origin_x: float, \
                             origin_y: float, inwards_variation: float) -> list:
         """
         Draws a point on a circle's circumference around a point
@@ -235,6 +266,10 @@ class Feature:
         x = (offset*inwards_variation) * math.cos(radian) + origin_x
         y = (offset*inwards_variation) * math.sin(radian) + origin_y
         return [x, y]
+    
+    def __inside_circle():
+        """Private function for checking if a value is inside a circle"""
+        pass
 
 
 class GeojsonObject:
@@ -378,18 +413,24 @@ class GeojsonObject:
         return len(self.dict["features"])
     
     def get_property(self, id, property):
+        """Returns a features' (id) single property by name"""
         if id is not None and property:
             return self.dict["features"][id]["properties"].get(property)
         
-    def get_properties(self, id: int):
+    def get_properties(self, id: int, skipwarn=True) -> dict:
+        """
+        Returns the properties dict for a feature
+        skipwarn can be used for debugging
+        """
         if id is not None:
             return self.dict["features"][id]["properties"]
-        raise ValueError(f"Properties for ID {id} is not accessible")
+        if not skipwarn:
+            raise ValueError(f"Properties for ID {id} is not accessible")
     
     # querys/searches
-    def query_name(self, searchname, casesensitive=False):
+    def query_name(self, searchname: str, casesensitive: bool=False) -> int:
         """
-        Search the geojson for a searchname. 
+        Searches the geojson for a searchname. 
         Returns the ID for the first name found.
         If name was not found returns None.
         """
@@ -402,9 +443,9 @@ class GeojsonObject:
                 return id
         return None
 
-    def query_names(self, searchname):
+    def query_names(self, searchname: str) -> list:
         """
-        Gives back a list of all IDs with the searchname
+        Returns a list of all IDs with the searchname
         If no items with the name are found returns None
         """
         nameids = []
@@ -416,13 +457,14 @@ class GeojsonObject:
         return None
 
     def query_all_property(self, propertyname):
+        """Returns a list of all characteristic values of a certain propertyname"""
         propls = []
         for id in range(self.get_feature_count()):
             propls.append(self.get_property(id, propertyname))
         return propls
 
     # more advanced calculations (quite project specific)
-    def calc_total(self, function):
+    def calc_total(self, function) -> float: 
         """
         Calculate a total value by running the passed function for every feature 
         Currently supported functions are:
@@ -430,15 +472,15 @@ class GeojsonObject:
         calc_circumference_geod
 
         Example use would be: 
-        total_len = lineobj.calc_total(lineobj.calc_length_geod)
+        total_len = lineobj.calc_total(lineobj.calc_length_geod())
         This would run the .calc_length_geod function for each feature in lineobj
         """
         total = 0
         for id in range(self.get_feature_count()):
             total += function(id)
-        return total
+        return float(total)
 
-    def calc_circumference_geod(self, id):
+    def calc_circumference_geod(self, id: int) -> float:
         """
         Calculates the circumference (m) of a Polygon
         Can only handle METRIC "coordinates" 
@@ -451,9 +493,9 @@ class GeojsonObject:
         for coord, c_pair in enumerate(coordlist):
             if coord: # if id is used here to skip the zero-index - going from the second feature=>first to the end
                 ft_length += math.dist(c_pair, coordlist[(coord-1)])
-        return ft_length
+        return float(ft_length)
 
-    def calc_length_geod(self, id):
+    def calc_length_geod(self, id: int) -> float:
         """
         Calculates the length (m) of a LineString
         Can only handle METRIC "coordinates" 
@@ -463,11 +505,14 @@ class GeojsonObject:
         # while it seems counterintuitive to have the same calculation take place
         # for both polygons and linestrings, it makes sense due to the way the dictionaries
         # are laid out
-        return self.calc_circumference_geod(id)
+        return float(self.calc_circumference_geod(id))
 
     # type conversions
-    def convert_to_multipoint(self, inplace=False):
-        """This function converts all polygons in a geojson to a single MultiPoint feature"""
+    def convert_to_multipoint(self, inplace: bool=False) -> dict:
+        """
+        This function converts all polygons in a geojson to a single MultiPoint feature
+        Properties are NOT conserved (Merge could be implemented at some point)
+        """
         types = self.get_types()
         finalls = []
         if len(types) > 1:
@@ -475,7 +520,7 @@ class GeojsonObject:
 
         for feature in self.dict["features"]:
             for elem in feature["geometry"]["coordinates"]:
-                partls = self.PRIVATE_coordcrawler(elem)
+                partls = self.__coordcrawler(elem)
                 for elem in partls:
                     finalls.append(elem)
 
@@ -489,7 +534,7 @@ class GeojsonObject:
             retdict["features"].append(new_feature(featuretype="MultiPoint", coordinates=finalls))
             return retdict
 
-    def convert_to_multipoint_alt(self, inplace=False):
+    def convert_to_multipoint_alt(self, inplace: bool=False) -> dict:
         """
         DEPRECATED!
 
@@ -512,8 +557,8 @@ class GeojsonObject:
         else:
             return enddict
         
-    def PRIVATE_coordcrawler(self, *args):
-        """PRIVATE! Crawls through a coords dict and returns all coords individually"""
+    def __coordcrawler(self, *args):
+        """PRIVATE. Crawls through a coords dict and returns all coords individually"""
         coords = []
         for elem in args:
             if isinstance(elem[0], list):
