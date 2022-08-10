@@ -11,6 +11,9 @@ import pandas as pd
 import numpy as np
 import random
 import time # because I'm curious about code performance
+
+import seaborn as sns
+
 """
 
 Use the air-quality-covid19-response data from Lecture 10
@@ -22,7 +25,7 @@ Create a new dataframe with the 2015-2019 daily NO2 and
 O3 concetrations for Athens. Add a new column with
 the season (i.e., winter, spring, summer, and autumn).
 
-Hint: Use the Path class from the pathlib module to point to 
+Hint: Use the Path class from the pathlib module to point to
       the folder with air-quality-covid19-response data (see Lecture 10).
 """
 
@@ -36,12 +39,12 @@ def load_cams_air_qual_data(folderpath: str, start_year: int=2015, end_year: int
     dflist = []
     # we can try to import every csv name up to 2050 (function default)
     # That way, no "end"-year needs to be defined
-    try: 
+    try:
         for date in range(start_year, (end_year+1)):
             datapath = Path(rf"{folderpath}\cams_air_quality_analysis_{date}.csv")
             df = pd.read_csv(datapath)
             dflist.append(df)
-    except: 
+    except:
         pass
 
     new_df = pd.concat(dflist, axis=0)
@@ -53,14 +56,13 @@ def load_cams_air_qual_data(folderpath: str, start_year: int=2015, end_year: int
 df = load_cams_air_qual_data("air-quality-covid19-response", 2015, 2019)
 
 # select only NO2 and O3 for athens
-# CODE ...
+df = df.loc[df["city_id"] == "AQ003", ["NO2", "O3"]]
 
-
-
-# o.O
-
-names = ["winter", "winter", "spring", "spring", "spring", "summer", "summer", "summer","fall", "fall", "fall", "winter"]
+# cheeky month mapping
+names = ["winter", "winter", "spring", "spring", "spring",
+         "summer", "summer", "summer", "fall", "fall", "fall", "winter"]
 df["season"] = [names[(row.month-1)] for row in df.index]
+
 
 
 
@@ -82,22 +84,6 @@ df["season"] = [names[(row.month-1)] for row in df.index]
 # end of shared code
 
 
-# a variant with dictionary. Slower by around 60%.
-
-    # season = []
-    # ident_list = {"winter": [12, 1, 2], 
-    #               "spring": [3, 4, 5], 
-    #               "summer": [6, 7, 8], 
-    #               "fall"  : [9, 10, 11]}
-
-    # for row in df.index:
-    #     for name, identifier in ident_list.items():
-    #         if row.month in identifier: 
-    #             season.append(name)
-    #             continue
-    # df["season"] = season
-
-
 """
 Subtask 7.2
 -----------
@@ -108,32 +94,39 @@ Your figure should also include a linear regression line.
 Hint: https://seaborn.pydata.org/generated/seaborn.lmplot.html#seaborn.lmplot (See example 1)
 """
 
-# # get df length
-# new_df = pd.DataFrame({"hello": [1, 2, 3], "goodbye": [4, 5, 6]})
-# df_length = len(new_df)
-# number = 100
-# randlist = []
+# get df length
+def randselect(data: pd.DataFrame, iterations: int) -> pd.DataFrame:
+    randlist = []
+    for foo in range(iterations):
+        randnum = random.randint(0, len(df)-1)
+        value = data.iloc[[randnum]]
+        randlist.append(value)
+    return pd.concat(randlist, axis=0)
 
-# for foo in range(number):
-#     randnum = random.randint(0, df_length-1)
-#     value = new_df.iloc[randnum]["hello"]
-#     randlist.append(value)
+randlist7_2 = randselect(df, 7000)
+sns.lmplot(x="O3", y="NO2", data=randlist7_2, aspect=2, markers=".", \
+           scatter_kws={'alpha':0.15})
 
-# print(randlist)
 
 
 
 """
 
-Subtask 7.2
+Subtask 7.3
 -----------
 Randomly select 28000 rows from the dataframe of subtask 7.1. Use seaborn
 to create a scatterplot presenting the randomly selected NO2 and O3 values
 per season. Each subplot should also include a linear regression line.
 
 Hint: https://seaborn.pydata.org/generated/seaborn.lmplot.html#seaborn.lmplot (See example 7)
+"""
+
+randlist7_2 = randselect(df, 28000)
+sns.lmplot(x="O3", y="NO2", data=randlist7_2, aspect=2, row="season", markers=".", \
+           scatter_kws={'alpha':0.15})
 
 
+"""
 Subtask 7.4
 -----------
 Use seaborn to create a figure that presents Athens' NO2 and O3 distributions
@@ -142,30 +135,33 @@ Each row should include 4 histrogramms (one per season). The first row should pr
 the NO2 distribution and the the second the O3.
 
 Hint: https://seaborn.pydata.org/examples/faceted_histogram.html
+"""
 
 
+"""
 Subtask 7.5
 -----------
 Calculate the mean NO2 concentration per month and year (for Athens) and
 use seaborn to plot the result as a heatmap.
 
 Hint: https://seaborn.pydata.org/generated/seaborn.heatmap.html#seaborn.heatmap
+"""
 
-
+"""
 Subtask 7.6
 -----------
 What format codes should be used for coverting the
-following datestrings to datetime objects? 
+following datestrings to datetime objects?
 
     Datestrings                                      Format Code
 -----------------------------------------------------------------------------
-   24-March-2014                    |           %D-%xxx-%y
-   24.03.2014 15:23 CEST            |           Type your answer HERE.
-   Oct 24, 2020                     |           Type your answer HERE.
-   20210430                         |           %y%M%D
-   Sunday, September 8, 2013        |           Type your answer HERE.
-   
+   24-March-2014                    |           %e-%b-%Y
+   24.03.2014 15:23 CEST            |           %d.%m.%Y %H:%M %Z
+   Oct 24, 2020                     |           %b %e, %Y
+   20210430                         |           %Y%m%d
+   Sunday, September 8, 2013        |           %A, %B %e, %Y 
+
 Hint: https://strftime.org/
 
 """
-
+# 7.6 DONE! (just a reminder to myself)
