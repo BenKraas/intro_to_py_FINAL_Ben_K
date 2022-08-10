@@ -29,3 +29,45 @@ Complete the following subtasks:
 
 """
 
+import pandas as pd
+import os
+
+# empty console
+os.system("cls")
+##################################################################
+
+# read the csv
+df = pd.read_csv("data.csv")
+
+# print the number of rows and columns
+print(f"Rows: {len(df)}", f"Columns: {len(df.columns)}", end="\n")
+
+# print columns datatypes
+print(f"Datatypes by column: \n{str(df.dtypes)[:-14]} \n")
+
+# column names:
+print(f"Column names: {list(df.keys())}")
+
+# NaN Values
+print(f"Contains NaN values: \n{df.isna().any()}")
+
+# dataframes:
+df1 = df.loc[:, ["UID", "land_cover", "mast"]]
+df2 = df.loc[df["land_cover"] == "urban"]
+df3 = df.loc[(df["land_cover"] == "rural_bare") & \
+             (df["group"] == "workday")]
+df4 = df.loc[(df["mast"] >= 295) & \
+             (df["yast"] <  20)]
+
+
+# number of entries with "overpass" == "D"
+nr_9 = len( df.loc[df["overpass"] == "D"] ) # => 644
+
+# df.loc[df["overpass"]
+
+# 10. Calculate the mean, min, max, std, and median of the column `mast` and `yast` in `df3`.
+
+
+
+print(mean_lst)
+input("Press Enter to exit") # keeps console alive when running outside IDE

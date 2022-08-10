@@ -35,7 +35,6 @@ ls.append(type(lakes))
 ls.append(len(lakes))
 # => 3
 
-
 # 3. How many items are in `features`?
 ls.append(len(lakes["features"]))
 # => 25
@@ -47,7 +46,7 @@ ls.append(type(lakes["features"]))
 
 
 # 5. What are the properties of each feature?
-ls.append(str(lakes["features"][0]["properties"].keys())[11:-2])
+ls.append(str(lakes["features"][0]["properties"].keys())[11:-2]) # 
 # => 'scalerank', 'featurecla', 'name', 'name_alt', 
 #    'admin', 'min_zoom', 'min_label'
 
@@ -105,7 +104,7 @@ for feature in lakes["features"]:
 lake_name = "Lake Superior"
 for feature in lakes["features"]:
 	if feature["properties"]["name"] == lake_name:
-		ls.append(f'Bounding box for {lake_name}:{feature["bbox"]})')
+		ls.append(f'Bounding box for {lake_name}: {feature["bbox"]})')
 
 
 # Finally,
@@ -113,7 +112,7 @@ for feature in lakes["features"]:
 # 15. Delete the first three items, i.e. the lakes Baikal,
 # Winnipeg, Slave Lake, from the “features” list.
 
-lakes["features"] = lakes["features"][3:] # deletes index 0, 1, 2
+lakes["features"] = lakes["features"][3:] # keeps 4 to end - effectively deleting index 0, 1, 2
 
 
 ls.append(len(lakes["features"])) # confirm that the list has been shortened
@@ -125,4 +124,4 @@ if PRINT_LIST:
 		print(str(number).replace("\n", ""))
 
 
-input("Enter to close...")
+input("Enter to close...") # to stop the console from ending when running outside IDE

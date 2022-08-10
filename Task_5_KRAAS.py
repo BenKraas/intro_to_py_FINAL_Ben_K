@@ -42,13 +42,15 @@ new_gjson = bk.GeojsonObject(bk.new_geojson())
 
 new_feature = rivers.get_feature(id)
 new_gjson.append(new_feature)
+
+# new geojson dict: new_gjson.dict
        
 """
 Subtask 5.3
 -----------
 Calculate the length of each river and add it as a property.
 """
-# if I would do calculations on small scale maps I'd use geopy.distance.geodesic 
+# if you did calculations on small scale maps you could use geopy.distance.geodesic 
 
 for river_id in range(rivers.get_feature_count()):
     rivers.dict["features"][river_id]["properties"]["river_length"] \

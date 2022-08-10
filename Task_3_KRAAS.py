@@ -174,7 +174,7 @@ def convert_to_lcz(*args, **kwargs):
             # use indent=4 to make json more readable
             json.dump(LCZ_tresholds , fp) 
     
-    def comb(keys: object, param_row: dict):
+    def comb(keys: pd.DataFrame, param_row: dict):
         """
         Goes through the data and returns a DataFrames full of booleans.
 
@@ -237,6 +237,7 @@ def between(number: any, range_list: list):
         else:
             raise ValueError("First value in range_list must be smaller \
                               than second value!")
+
 
 def main():
     LCZ_code, LCZ_name = convert_to_lcz(sky_view_f=0.4, aspect_r=0.90, \

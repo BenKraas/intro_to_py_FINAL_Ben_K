@@ -38,7 +38,6 @@ def bounds_to_geojson(coordinates: tuple, savepath: str):
     test_dictionary = bk.new_feature(featuretype="Polygon", coordinates=coord_list)
 
     bk.beautydump(test_dictionary, savepath)
-    
 
 bounds_to_geojson((1, -1, -1, 1), "bk_bounds.geojson")
 
@@ -53,12 +52,7 @@ Test your code with the following polygon:
 
 gobj = bk.GeojsonObject()
 gobj.loadwd("polygon.geojson")
-
-print(gobj.dict)
-
 gobj.convert_to_multipoint(inplace=True)
-
-print(gobj.dict)
 
 
 
