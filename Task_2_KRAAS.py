@@ -29,15 +29,17 @@ Complete the following subtasks:
 
 """
 
-import pandas as pd
-import os
 import matplotlib.pyplot as plt
+import os
+import pandas as pd
 
 # empty console
 os.system("cls")
 
 # read the csv
 df = pd.read_csv("data.csv")
+
+
 
 # 1. print the number of rows and columns of `df`?
 print(f"\nNr 1.\nRows: {len(df)}", f"Columns: {len(df.columns)}", end="\n")
@@ -46,10 +48,12 @@ print(f"\nNr 1.\nRows: {len(df)}", f"Columns: {len(df.columns)}", end="\n")
 print(f"\nNr 2.\nDatatypes by column: \n{str(df.dtypes)[:-14]} \n")
 
 # 3. What are the column names of `df`?
-print(f"\nNr 3.\nColumn names: \n{list(df.keys())}")
+# print(f"\nNr 3.\nColumn names: \n{list(df.keys())}")
+column_names = list(df.keys())
 
 # 4. Use the methods `isna()` and `any()` to check if there any missing values.
-print(f"\nNr 4.\nContains NaN values: \n{df.isna().any()}")
+# print(f"\nNr 4.\nContains NaN values (per column): \n{df.isna().any()}")
+isna_values = bool(df.isna().any().all())
 
 # 5. Create a new dataframe called `df1` that includes only the columns `UID`, `land_cover` and `mast`.
 df1 = df.loc[:, ["UID", "land_cover", "mast"]]
@@ -77,11 +81,10 @@ df10 = df3.agg(
 )
 
 # 11. Subtract the value 273.15 from the column `mast` of `df`. 
-"""Which df though? I'm guessing df3 since that's the one I did the .agg calculation on..."""
 KELVIN = 273.15
 with pd.option_context('mode.chained_assignment', None):
     # I realize that this is bad practice - suppressing a warning instead of fixing it.
-    # However, I couldn't get the calculation done in a number of tried ways with this warning
+    # However, I couldn't get the calculation done in a number of tried ways without this warning:
 
     # Attempts:
     # df3["mast"] -= KELVIN
@@ -90,7 +93,7 @@ with pd.option_context('mode.chained_assignment', None):
     # df3.loc[:, "mast"] = df3["mast"].apply(lambda x: x - KELVIN)
     # df3.loc[:, "mast"] = df3.loc[:, "mast"].apply(lambda x: x - KELVIN)
 
-    # All yielded the "SettingWithCopyWarning" - warning
+    # All yielded the "SettingWithCopyWarning" warning
     
     # For now I'll stick with the easiest one, please let me know the proper way to do it!:
     df["mast"] -= KELVIN
@@ -104,7 +107,6 @@ df.drop(columns=['theta', 'theta_unc'], inplace=True)
 # 14. Rename the column `yast` of `df` to `YearlyAmplitude`.
 df.rename(columns={"yast": "YearlyAmplitude"}, inplace=True)
 
-print(df)
 # 15. Create a variable called `cities` that stores the unique `UID` values in `df`?
 cities = df['UID'].unique()
 
