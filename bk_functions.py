@@ -23,6 +23,7 @@ Edit: Syntax highlighting fixed, I hope I don't miss any return values
 
 import json
 import math
+import pandas as pd
 from pathlib import Path
 import random
 
@@ -62,6 +63,28 @@ def new_feature(featuretype="MultiPoint", coordinates=None, properties=None) -> 
         }
     }
 
+def load_cams_air_qual_data(folderpath: str, start_year: int=2015, end_year: int= 2050) -> pd.DataFrame:
+    """
+    Specific function to load all "cams_air_quality_analysis_".csv files.
+    Returns all files concatinated and properly formated with basetime as datetime index.
+    A path to the data folder must be provided
+    Both start_year and end_year are included in the returned DataFrame
+    """
+    dflist = []
+    # we can try to import every csv name up to 2050 (function default)
+    # That way, no "end"-year needs to be defined
+    try:
+        for date in range(start_year, (end_year+1)):
+            datapath = Path(rf"{folderpath}\cams_air_quality_analysis_{date}.csv")
+            df = pd.read_csv(datapath)
+            dflist.append(df)
+    except:
+        pass
+
+    new_df = pd.concat(dflist, axis=0)
+    new_df["basetime"] = pd.to_datetime(new_df["basetime"])
+    new_df = new_df.set_index("basetime")
+    return new_df
 
 class Feature:
     """
