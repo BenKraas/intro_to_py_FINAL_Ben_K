@@ -7,7 +7,7 @@ Final Project - TASK 6
 ======================
 """
 import bk_functions as bk
-import math
+
 """
 Subtask 6.1
 -----------
