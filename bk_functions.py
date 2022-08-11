@@ -92,7 +92,7 @@ class Feature:
     """
     def __init__(self, featuretype: str="Point", coordinates: list=None, \
                  properties: dict=None, dictionary: dict=None):
-        if coordinates is None: coordinates=[] # solve mutable default args
+        if coordinates is None: coordinates=[] # solve mutable default args problem 
         if properties is None: properties={}
         if dictionary is None: dictionary={}
 
@@ -110,7 +110,7 @@ class Feature:
     def new(self, featuretype: str="Point", coordinates: list=None, \
             properties: dict=None):
         """Creates the foundation of a new feature. Should be populated"""
-        if coordinates is None: coordinates=[] # solve mutable default args
+        if coordinates is None: coordinates=[] # solve mutable default args problem
         if properties is None: properties={}
 
         self.dict = {
@@ -334,7 +334,7 @@ class GeojsonObject:
         OR
         it must be populated with loadsample() - a sample dictionary will be loaded
         """
-        if geojson is None: geojson={} # solve mutable default args
+        if geojson is None: geojson={} # solve mutable default args problem
         if not geojson:
             geojson = new_geojson()
         self.dict = geojson
