@@ -5,6 +5,8 @@ I hope that this is not against the "rules" for the final exercise.
 Author: Ben Kraas (https://github.com/KtRNofficial)
 """
 
+# TODO:
+# Check if __private_method can be called correctly
 """
 Disclaimer:
 
@@ -99,6 +101,7 @@ class Feature:
         self.update()
 
     def update(self):
+        """This method serves the purpose of populating the objects' attributes."""
         self.type = self.dict["geometry"]["type"]
 
     def get_coordinates(self) -> list:
@@ -106,13 +109,17 @@ class Feature:
         return self.dict["geometry"]["coordinates"]
 
     def get_coordinates_raw(self):
-        """WIP"""
+        """
+        WIP!
+        Supposed to crawl through coordinate lists regardless of Featuretype
+        """
         pass
 
     def add_vertex(self, coordinates: list):
         """
         Add a vertex to the coordinate list. 
         Currently only supports MultiPoints and Polygons
+
         WIP
         """
         ftype = self.dict["geometry"]["type"]
@@ -144,11 +151,13 @@ class Feature:
 
         Lists in matrix should all be of the same length.
         You can ignore this if you know what you are doing.
+
         e.g. [[1], [1, 0], [0, 1, 1, 0]] instead of 
         [[1, 1, 1, 1], [1, 0, 1, 0], [0, 1, 1, 0]]
         
         Alternatively, a matrixname for the grid can be passed which builds on a number of
         prebuilt matrices
+        
         Possible matrixnames are: full, checkerboard, big_checkerboard, sparse, sparse_alt, diagonal,
         raster
         """
@@ -166,9 +175,8 @@ class Feature:
             counter_lon, pointer_lon = 0, lon_W
             while pointer_lon <= lon_E:
                 # create point
-                matnum = matline[(counter_lon%len(matrix[counter_lat%matlen]))]
+                matnum = matline[(counter_lon % len(matrix[counter_lat%matlen]))]
                 if matnum:
-                    # print([counter_lon, counter_lat, matnum, matline, pointer_lon, pointer_lat])
                     self.add_vertex([pointer_lon, pointer_lat])
                 # increment lon
                 counter_lon += 1
@@ -204,11 +212,10 @@ class Feature:
                       [0, 0, 0, 1, 0, 0, 0, 0], 
                       [0]] 
                       # you can tell I had fun here :)
-                      # my girlfriend approves, though she`d move matrix[3][1] down by one
+                      # my girlfriend approves, though she`d move matrix[1][3] down by one
         else:
             raise ValueError("A correct matrix name or matrix must be provided")
         return matrix
-        
 
     def offset_circular(self, offset: float, offset_fixed: bool=False, inplace: bool=False) -> object:
         """
