@@ -30,9 +30,6 @@ the season (i.e., winter, spring, summer, and autumn).
 Hint: Use the Path class from the pathlib module to point to
       the folder with air-quality-covid19-response data (see Lecture 10).
 """
-
-
-
 # load data
 df = bk.load_cams_air_qual_data("air-quality-covid19-response", 2015, 2019)
 
@@ -40,13 +37,14 @@ df = bk.load_cams_air_qual_data("air-quality-covid19-response", 2015, 2019)
 df = df.loc[df["city_id"] == "AQ003", ["NO2", "O3"]]
 
 # cheeky month mapping
-names = [None,"winter", "winter", "spring", "spring", "spring",
-         "summer", "summer", "summer", "fall", "fall", "fall", "winter"]
+names = [None,"winter", "winter", "spring", "spring", "spring", "summer", 
+         "summer", "summer", "fall", "fall", "fall", "winter"]
 df["season"] = [names[row.month] for row in df.index]
 
 # check whether only the 4 seasons occurr
 seasons = df["season"].unique() 
 # => this is the case
+
 
 
 # legacy code:
@@ -83,7 +81,7 @@ def randselect(data: pd.DataFrame, iterations: int) -> pd.DataFrame:
         randlist.append(value)
     return pd.concat(randlist, axis=0)
 
-randlist7_2 = randselect(df, 7)
+randlist7_2 = randselect(df, 700)
 sns.lmplot(x="O3", y="NO2", data=randlist7_2, aspect=2, markers=".", \
            scatter_kws={'alpha':0.15})
 
@@ -101,11 +99,9 @@ per season. Each subplot should also include a linear regression line.
 Hint: https://seaborn.pydata.org/generated/seaborn.lmplot.html#seaborn.lmplot (See example 7)
 """
 
-randlist7_2 = randselect(df, 28)
-sns.lmplot(x="O3", y="NO2", data=randlist7_2, aspect=2, row="season", markers=".", \
-           scatter_kws={'alpha':0.15})
-
-# TODO: Per season!!!
+#randlist7_3 = randselect(df, 2800)
+#sns.lmplot(x="O3", y="NO2", data=randlist7_3, aspect=2, markers=".", \
+           #scatter_kws={'alpha':0.15}, col_wrap=2, col="season")
 
 """
 Subtask 7.4
@@ -118,6 +114,10 @@ the NO2 distribution and the the second the O3.
 Hint: https://seaborn.pydata.org/examples/faceted_histogram.html
 """
 
+sns.displot(
+    df, y="O3", col="season", row=("O3", "NO2"),
+    binwidth=3, height=3, facet_kws=dict(margin_titles=True),
+)
 
 """
 Subtask 7.5

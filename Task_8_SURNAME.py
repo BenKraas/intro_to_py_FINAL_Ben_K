@@ -10,6 +10,9 @@ Use the air-quality-covid19-response data from Lecture 10
 (available on moodle) to address the following subtasks:
 """
 
+import bk_functions as bk
+import pandas as pd
+from pathlib import Path
 
 
 """
@@ -23,6 +26,14 @@ Hint: Use the Path class from the pathlib module to point to
       the folder with air-quality-covid19-response data (see Lecture 10).
 """
 
+df = bk.load_cams_air_qual_data("air-quality-covid19-response", 2015, 2019)
+keys = pd.read_csv(Path(fr"air-quality-covid19-response\CAMS_AQ_LOCATIONS_V1.csv"))
+
+# idls = [keys.iloc[row] for row in df.loc["city_ids"]]
+
+# pandas map ?
+
+# print(idls)
 
 
 """
@@ -37,6 +48,28 @@ Answer the following:
   the max and min NO2 concentration) in each city?
 """
 
+keys_germany = keys.loc[keys["country"] == "Germany"] 
+
+keyslist = list(keys_germany["id"])
+
+new_df = pd.DataFrame()
+ls = []
+
+for city_id in keyslist:
+    ls.append(df.loc[df["city_id"] == city_id].agg(
+        {
+            "NO2": ["mean", "sem", "min", "max"],
+        }
+    ))
+
+new_df = pd.concat(ls)
+print(new_df)
+  
+# df2 = df.agg(
+#     {
+#         "NO2": ["mean", "min", "max", "std", "median"],
+#     }
+# )
 
 
 """
