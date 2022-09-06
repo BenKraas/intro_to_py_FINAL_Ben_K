@@ -82,9 +82,10 @@ def randselect(data: pd.DataFrame, iterations: int) -> pd.DataFrame:
     return pd.concat(randlist, axis=0)
 
 randlist7_2 = randselect(df, 700)
-sns.lmplot(x="O3", y="NO2", data=randlist7_2, aspect=2, markers=".", \
-           scatter_kws={'alpha':0.15})
 
+# plot
+ax2 = sns.lmplot(x="O3", y="NO2", data=randlist7_2, aspect=2, markers=".", \
+                 scatter_kws={'alpha':0.15})
 
 
 
@@ -98,6 +99,7 @@ per season. Each subplot should also include a linear regression line.
 
 Hint: https://seaborn.pydata.org/generated/seaborn.lmplot.html#seaborn.lmplot (See example 7)
 """
+# uncommmented for code performance TODO
 
 #randlist7_3 = randselect(df, 2800)
 #sns.lmplot(x="O3", y="NO2", data=randlist7_3, aspect=2, markers=".", \
@@ -114,10 +116,12 @@ the NO2 distribution and the the second the O3.
 Hint: https://seaborn.pydata.org/examples/faceted_histogram.html
 """
 
-sns.displot(
-    df, y="O3", col="season", row=("O3", "NO2"),
-    binwidth=3, height=3, facet_kws=dict(margin_titles=True),
-)
+# TODO!
+#sns.displot(
+#    df, y="O3", col="season", row=("O3", "NO2"),
+#    binwidth=3, height=3, facet_kws=dict(margin_titles=True),
+#)
+
 
 """
 Subtask 7.5
@@ -127,6 +131,20 @@ use seaborn to plot the result as a heatmap.
 
 Hint: https://seaborn.pydata.org/generated/seaborn.heatmap.html#seaborn.heatmap
 """
+
+# calculate monthly means as df
+df75 = df.resample('M', axis=0).mean()
+
+# add columns for month and year to easily use the pandas.pivot function
+df75['year'] = df75.index.year
+df75['month'] = df75.index.month
+
+# pivot the table so months go on the y-axis and years on the x-axis
+df75_2 = df75.pivot("month", "year", "NO2")
+
+# plot  (uncomment to see in spyder - plots):
+#ax = sns.heatmap(df75_2)
+
 
 """
 Subtask 7.6

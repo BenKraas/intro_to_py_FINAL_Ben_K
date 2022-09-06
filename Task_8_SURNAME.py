@@ -27,8 +27,11 @@ Hint: Use the Path class from the pathlib module to point to
 """
 
 df = bk.load_cams_air_qual_data("air-quality-covid19-response", 2015, 2019)
-keys = pd.read_csv(Path(fr"air-quality-covid19-response\CAMS_AQ_LOCATIONS_V1.csv"))
+keys = pd.read_csv(Path(r"air-quality-covid19-response\CAMS_AQ_LOCATIONS_V1.csv"))
 
+
+
+### legacy
 # idls = [keys.iloc[row] for row in df.loc["city_ids"]]
 
 # pandas map ?
@@ -52,31 +55,52 @@ keys_germany = keys.loc[keys["country"] == "Germany"]
 
 keyslist = list(keys_germany["id"])
 
-new_df = pd.DataFrame()
-ls = []
 
-for city_id in keyslist:
-    ls.append(df.loc[df["city_id"] == city_id].agg(
-        {
-            "NO2": ["mean", "sem", "min", "max"],
-        }
-    ))
 
-new_df = pd.concat(ls)
-print(new_df)
-  
-# df2 = df.agg(
-#     {
-#         "NO2": ["mean", "min", "max", "std", "median"],
-#     }
-# )
+
+
+
+
+
+
+
+
+
+### Legacy
+# for city_id in keyslist:
+#     mean = float(df.loc[df["city_id"] == city_id, ["NO2"]].mean())
+#     sem  = float(df.loc[df["city_id"] == city_id, ["NO2"]].sem())
+#     mini = float(df.loc[df["city_id"] == city_id, ["NO2"]].min())
+#     maxi = float(df.loc[df["city_id"] == city_id, ["NO2"]].max())
+#     print(mean, sem, mini, maxi)
+
+
+
+
+
+### Legacy
+# ls, new_df= list(), pd.DataFrame()
+# for city_id in keyslist:
+#     newdf = df.loc[df["city_id"] == city_id].agg(
+#         {
+#             "NO2": ["mean", "sem", "min", "max"],
+#         }
+#     )
+#     newdf.reset_index(drop=True)
+#     newdf["city_id"] = city_id
+#     ls.append(newdf)
+#     print(newdf)
+
+# new_df = pd.concat(ls)
+
+# dfpivot = new_df.pivot(index="city_id", columns=)
 
 
 """
 Subtask 8.3
 -----------
 Using the data from subtask 8.2 calculate the 95% lower and upper
-confidence intervals for each monhtly mean.
+confidence intervals for each monthly mean.
 """
 
 
