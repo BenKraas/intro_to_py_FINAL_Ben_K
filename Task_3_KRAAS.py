@@ -51,7 +51,7 @@ def convert_to_lcz(*args, **kwargs):
     """
     This functions calculates the LCZ (Local climate zone) given 7 parameters.
 
-    Returns: (LCZ_code, LCZ_name)
+    Returns: tuple(LCZ_code, LCZ_name)
 
     Accepted parameters are (in order):
     sky_view_f  : sky view factor
@@ -65,12 +65,13 @@ def convert_to_lcz(*args, **kwargs):
     Alternatively, you can pass ALL these values as key-value pairs (kwargs)
     You must however EITHER pass all as args OR as kwargs. No mixing ;)
 
-    If a parameter is not given, the calculation can not take place 
+    If a parameter is not given, the calculation can not take place.
 
     Author: Ben Kraas (https://github.com/KtRNofficial)
     """
 
-    # nested functions
+    ### nested functions
+    
     def import_lcz_data():
         """
         PRIVATE function specific to convert_to_lcz()
@@ -134,6 +135,7 @@ def convert_to_lcz(*args, **kwargs):
         PRIVATE function specific to convert_to_lcz()
 
         Call this function to create the LCZ_key_data.json used in the function.
+        The dict will be saved in the working directory.
         Automatically called by convert_to_lcz() if json does not exist
         
         Source: Task_3_LCZ_Thresholds.png
@@ -205,6 +207,9 @@ def convert_to_lcz(*args, **kwargs):
                     finaldf.loc[row,col] = final_val
         return finaldf
 
+
+    ### MAIN
+    
     # preparation of keys data 
     # this table will be used to determine whether a number is within a range
     LCZ_key = import_lcz_data()
@@ -231,7 +236,10 @@ def convert_to_lcz(*args, **kwargs):
                           Implementation of closest LCZ not done (not required but easily possible)")
 
 def between(number: any, range_list: list):
-        """Checks if a number is between two values"""
+        """
+        Checks if a number is between two values
+        Includes both start and end value!
+        """
         if range_list[0] <= range_list[1]:
             return range_list[0] <= number <= range_list[1]
         else:
