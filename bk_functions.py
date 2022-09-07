@@ -1,5 +1,5 @@
 """
-Collection of functions and classes used repeatedly over all 8 tasks.
+Collection of functions and classes used repeatedly over most of the 8 tasks.
 I hope that this is not against the "rules" for the final exercise.
 
 Author: Ben Kraas (https://github.com/KtRNofficial)
@@ -7,19 +7,6 @@ Author: Ben Kraas (https://github.com/KtRNofficial)
 
 # TODO:
 # Check if __private_method can be called correctly
-"""
-Disclaimer:
-
-I might not specify return values of functions as in
-
-foo(bar: int) -> not_specified:
-    pass
-
-because it completely messes up syntax highlighting in VSC  
-and I can't have that during development.
-
-Edit: Syntax highlighting fixed, I hope I don't miss any return values
-"""
 
 import json
 import math
@@ -36,10 +23,12 @@ def load_json(path: Path) -> dict:
     return data
 
 def beautydump(jsondict: dict, savepath: Path):
+    """dumps a json at a path with indentation"""
     with open(savepath, "w") as f:
         json.dump(jsondict, f, indent=4)
 
 def dump(jsondict: dict, savepath: Path):
+    """dumps a json at a path without indentation"""
     with open(savepath, "w") as f:
         json.dump(jsondict, f)
 
@@ -63,7 +52,7 @@ def new_feature(featuretype="MultiPoint", coordinates=None, properties=None) -> 
         }
     }
 
-def load_cams_air_qual_data(folderpath: str, start_year: int=2015, end_year: int= 2050) -> pd.DataFrame:
+def load_cams_air_qual_data(folderpath: str, start_year: int=2015, end_year: int=2050) -> pd.DataFrame:
     """
     Specific function to load all "cams_air_quality_analysis_".csv files.
     Returns all files concatinated and properly formated with basetime as datetime index.
@@ -88,14 +77,15 @@ def load_cams_air_qual_data(folderpath: str, start_year: int=2015, end_year: int
 
 class Feature:
     """
-    
+    Object handling geojson features
     """
     def __init__(self, featuretype: str="Point", coordinates: list=None, \
                  properties: dict=None, dictionary: dict=None):
+        """constructor for the Feature - class"""
         if coordinates is None: coordinates=[] # solve mutable default args problem 
-        if properties is None: properties={}
-        if dictionary is None: dictionary={}
-
+        if properties  is None: properties={}
+        if dictionary  is None: dictionary={}
+        
         if dictionary:
             self.dict = dictionary
         else:
@@ -111,7 +101,7 @@ class Feature:
             properties: dict=None):
         """Creates the foundation of a new feature. Should be populated"""
         if coordinates is None: coordinates=[] # solve mutable default args problem
-        if properties is None: properties={}
+        if properties  is None: properties={}
 
         self.dict = {
             "type": "Feature",
@@ -128,7 +118,7 @@ class Feature:
         self.type = self.dict["geometry"]["type"]
 
     def get_coordinates(self) -> list:
-        """Returns the Feaature's coordinate list"""
+        """Returns the Feature's coordinate list"""
         return self.dict["geometry"]["coordinates"]
 
     def get_coordinates_raw(self):
@@ -142,8 +132,8 @@ class Feature:
         """
         Add a vertex to the coordinate list. 
         Currently only supports MultiPoints and Polygons
-
-        WIP
+            
+        WIP (beyond scope for this project)
         """
         ftype = self.dict["geometry"]["type"]
         if ftype == "MultiPoint": 
@@ -174,15 +164,14 @@ class Feature:
 
         Lists in matrix should all be of the same length.
         You can ignore this if you know what you are doing.
-
-        e.g. [[1], [1, 0], [0, 1, 1, 0]] instead of 
+        e.g.: [[1], [1, 0], [0, 1, 1, 0]] instead of 
         [[1, 1, 1, 1], [1, 0, 1, 0], [0, 1, 1, 0]]
         
         Alternatively, a matrixname for the grid can be passed which builds on a number of
         prebuilt matrices
         
-        Possible matrixnames are: full, checkerboard, big_checkerboard, sparse, sparse_alt, diagonal,
-        raster
+        Possible matrixnames are: full, checkerboard, big_checkerboard, sparse,
+        sparse_alt, diagonal,raster
         """
         if matrix == None and matrixname:
             matrix = self.PRIVATE_resolve_matrix(matrixname)
