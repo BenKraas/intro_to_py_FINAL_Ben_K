@@ -55,6 +55,29 @@ keys_germany = keys.loc[keys["country"] == "Germany"]
 
 keyslist = list(keys_germany["id"])
 
+ls = list()
+
+for city_id in keyslist:
+    # this is not necessarily an elegant solution but one that easily works for me
+    new_df = pd.DataFrame()
+    new_df["mean"] = df.loc[df["city_id"] == city_id, ["NO2"]].mean()
+    new_df["sem"]  = df.loc[df["city_id"] == city_id, ["NO2"]].sem()
+    new_df["mini"] = df.loc[df["city_id"] == city_id, ["NO2"]].min()
+    new_df["maxi"] = df.loc[df["city_id"] == city_id, ["NO2"]].max()
+    ls.append(new_df)
+    print(new_df)
+
+print(ls)
+findf = pd.concat(ls)
+
+
+print(findf)
+
+# - In which city, the NO2 concetration is greatest and when?
+
+# - Which month the NO2 becomes maximum and minimum in Cologne?
+# - What is the NO2 inter-annual range (i.e., the difference between
+#   the max and min NO2 concentration) in each city?
 
 
 
@@ -64,6 +87,20 @@ keyslist = list(keys_germany["id"])
 
 
 
+
+### legacy
+# ls, new_df= list(), pd.DataFrame()
+# for city_id in keyslist:
+#     newdf = df.loc[df["city_id"] == city_id].agg(
+#         {
+#             "NO2": ["mean", "sem", "min", "max"],
+#         }
+#     )
+#     newdf.reset_index(drop=True)
+#     newdf["city_id"] = city_id
+#     xdf = keys_germany.loc[keys["id"] == city_id]
+#     newdf["city_name"] = xdf.iloc[0]['name']
+#     ls.append(newdf)
 
 
 ### Legacy
@@ -73,9 +110,6 @@ keyslist = list(keys_germany["id"])
 #     mini = float(df.loc[df["city_id"] == city_id, ["NO2"]].min())
 #     maxi = float(df.loc[df["city_id"] == city_id, ["NO2"]].max())
 #     print(mean, sem, mini, maxi)
-
-
-
 
 
 ### Legacy
