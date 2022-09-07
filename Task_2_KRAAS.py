@@ -70,7 +70,7 @@ df4 = df.loc[(df["mast"] >= 295) & \
              (df["yast"] <  20)]
 
 # 9. Calculate how many times “D” occurs in the column `overpass` of `df`.
-df9 = len( df.loc[df["overpass"] == "D"] ) # => 644
+df9 = len(df.loc[df["overpass"] == "D"] ) # => 644
 
 # 10. Calculate the mean, min, max, std, and median of the column `mast` and `yast` in `df3`.
 df10 = df3.agg(
