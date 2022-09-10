@@ -14,8 +14,6 @@ import pandas as pd
 from pathlib import Path
 import random
 
-from numpy import float16
-
 def load_json(path: Path) -> dict:
     """loads and returns a json dict"""
     with open(path) as json_file:
@@ -52,6 +50,9 @@ def new_feature(featuretype="MultiPoint", coordinates=None, properties=None) -> 
         }
     }
 
+def get_wd() -> Path:
+    return (Path("").absolute())
+
 def load_cams_air_qual_data(folderpath: str, start_year: int=2015, end_year: int=2050) -> pd.DataFrame:
     """
     Specific function to load all "cams_air_quality_analysis_".csv files.
@@ -62,13 +63,17 @@ def load_cams_air_qual_data(folderpath: str, start_year: int=2015, end_year: int
     dflist = []
     # we can try to import every csv name up to 2050 (function default)
     # That way, no "end"-year needs to be defined
-    try:
-        for date in range(start_year, (end_year+1)):
-            datapath = Path(rf"{folderpath}\cams_air_quality_analysis_{date}.csv")
+
+    for date in range(start_year, (end_year+1)):
+        try:
+            datapath = Path(rf"{folderpath}\\cams_air_quality_analysis_{date}.csv").absolute() # broken, even though it should not be. Maybe because of folder space. TODO
+            print(datapath)
             df = pd.read_csv(datapath)
+            print(df)
             dflist.append(df)
-    except:
-        pass
+        except:
+            print("This did not work even though it should :(")
+            pass
 
     new_df = pd.concat(dflist, axis=0)
     new_df["basetime"] = pd.to_datetime(new_df["basetime"])
@@ -261,7 +266,9 @@ class Feature:
     def offset_circular_even(self, offset: float, inplace: bool=False) -> object:
         """
         Superiour scattering method. 
-        Scattering is even across the entire circular area
+        Scattering is even across the entire circular area.
+
+        For center-biased scattering, use self.offset_circular()
         """
         # code should scatter randomly on a square and then keep only the points inside a circle
 
@@ -299,14 +306,14 @@ class Feature:
         return [x, y]
     
     def __inside_circle():
-        """Private function for checking if a value is inside a circle"""
+        """Private function for checking if a value is inside a circle. WIP or not needed"""
         pass
 
 
 class GeojsonObject:
     """
     This class introduces an object-based approach to geojson handling.
-    Child objects on a per-feature basis could be implemented in the future.
+    Child objects on a per-feature basis could be implemented in the future. (WIP)
 
     Author: Ben Kraas (https://github.com/KtRNofficial)
     """

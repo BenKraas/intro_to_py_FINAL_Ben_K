@@ -15,6 +15,15 @@ import pandas as pd
 from pathlib import Path
 
 
+# load all necessary data:
+
+data = bk.load_cams_air_qual_data("air-quality-covid19-response", 2015, 2019)
+keys = pd.read_csv(Path(r"air-quality-covid19-response\CAMS_AQ_LOCATIONS_V1.csv"))
+keys_ge = keys.loc[keys["country"] == "Germany"] 
+keys_ge_id_list = list(keys_ge["id"])
+keys_ge_nm_list = list(keys_ge["name"])
+
+print(keys_ge)
 """
 Subtask 8.1
 -----------
@@ -25,9 +34,7 @@ names. The result should be a single csv file.
 Hint: Use the Path class from the pathlib module to point to 
       the folder with air-quality-covid19-response data (see Lecture 10).
 """
-
-df = bk.load_cams_air_qual_data("air-quality-covid19-response", 2015, 2019)
-keys = pd.read_csv(Path(r"air-quality-covid19-response\CAMS_AQ_LOCATIONS_V1.csv"))
+ 
 
 
 
@@ -38,6 +45,7 @@ keys = pd.read_csv(Path(r"air-quality-covid19-response\CAMS_AQ_LOCATIONS_V1.csv"
 
 # print(idls)
 
+final_df.to_csv('Task_8_1.csv') 
 
 """
 Subtask 8.2
@@ -51,40 +59,35 @@ Answer the following:
   the max and min NO2 concentration) in each city?
 """
 
-keys_germany = keys.loc[keys["country"] == "Germany"] 
 
-keyslist = list(keys_germany["id"])
 
 ls = list()
-
-for city_id in keyslist:
-    # this is not necessarily an elegant solution but one that easily works for me
+for city_id in keys_ge_id_list:
+    # this is not necessarily an elegant solution but one that is obvious.
+    # I had issues with .agg
     new_df = pd.DataFrame()
     new_df["mean"] = df.loc[df["city_id"] == city_id, ["NO2"]].mean()
     new_df["sem"]  = df.loc[df["city_id"] == city_id, ["NO2"]].sem()
     new_df["mini"] = df.loc[df["city_id"] == city_id, ["NO2"]].min()
     new_df["maxi"] = df.loc[df["city_id"] == city_id, ["NO2"]].max()
+    
+    xdf = keys_ge.loc[keys["id"] == city_id]
+    new_df["city_name"] = xdf.iloc[0]['name']
+    new_df["city_id"] = city_id
+    
     ls.append(new_df)
-    print(new_df)
 
-print(ls)
-findf = pd.concat(ls)
+final_df = pd.concat(ls)
 
-
-print(findf)
+print(final_df)
 
 # - In which city, the NO2 concetration is greatest and when?
 
 # - Which month the NO2 becomes maximum and minimum in Cologne?
+
 # - What is the NO2 inter-annual range (i.e., the difference between
+
 #   the max and min NO2 concentration) in each city?
-
-
-
-
-
-
-
 
 
 
@@ -146,3 +149,5 @@ Use the csv from subtask 8.1 and calculate the monthly mean, minimum, and maximu
 NO2 per year and city. Create a figure with 3 lineplots (one subplot for each statistic)
 that present the corresponding monthly values for each german city.
 """
+
+

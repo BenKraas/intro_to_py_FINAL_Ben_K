@@ -56,6 +56,7 @@ seasons = df["season"].unique()
     #     elif row.month in [3, 4, 5]:  season.append("spring")
     #     elif row.month in [6, 7, 8]:  season.append("summer")
     #     elif row.month in [9, 10, 11]:season.append("fall")
+    #     else: print("Won't happen")
 
     # df["season"] = season
 
@@ -72,8 +73,11 @@ Your figure should also include a linear regression line.
 Hint: https://seaborn.pydata.org/generated/seaborn.lmplot.html#seaborn.lmplot (See example 1)
 """
 
-# get df length
 def randselect(data: pd.DataFrame, iterations: int) -> pd.DataFrame:
+    """
+    Randomly selects a set number of rows from a dataset,
+    concats and returns them as a dataframe
+    """
     randlist = []
     for foo in range(iterations):
         randnum = random.randint(0, len(df)-1)
@@ -81,10 +85,11 @@ def randselect(data: pd.DataFrame, iterations: int) -> pd.DataFrame:
         randlist.append(value)
     return pd.concat(randlist, axis=0)
 
-randlist7_2 = randselect(df, 700)
+
+rand_df_7_2 = randselect(df, 700)
 
 # plot
-ax2 = sns.lmplot(x="O3", y="NO2", data=randlist7_2, aspect=2, markers=".", \
+ax2 = sns.lmplot(x="O3", y="NO2", data=rand_df_7_2, aspect=2, markers=".", \
                  scatter_kws={'alpha':0.15})
 
 
@@ -99,7 +104,7 @@ per season. Each subplot should also include a linear regression line.
 
 Hint: https://seaborn.pydata.org/generated/seaborn.lmplot.html#seaborn.lmplot (See example 7)
 """
-# uncommmented for code performance TODO
+# uncommmented for code performance - TODO
 
 #randlist7_3 = randselect(df, 2800)
 #sns.lmplot(x="O3", y="NO2", data=randlist7_3, aspect=2, markers=".", \
@@ -117,10 +122,10 @@ Hint: https://seaborn.pydata.org/examples/faceted_histogram.html
 """
 
 # TODO!
-#sns.displot(
-#    df, y="O3", col="season", row=("O3", "NO2"),
-#    binwidth=3, height=3, facet_kws=dict(margin_titles=True),
-#)
+sns.displot(
+   df, y="O3", col="season", row=("O3", "NO2"),
+   binwidth=3, height=3, facet_kws=dict(margin_titles=True),
+)
 
 
 """
