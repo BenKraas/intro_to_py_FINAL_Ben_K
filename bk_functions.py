@@ -1,11 +1,11 @@
 """
-Collection of functions and classes used repeatedly over most of the 8 tasks.
+Collection of functions, classes and methods used repeatedly over most of the 8 tasks.
 I hope that this is not against the "rules" for the final exercise.
 
 Author: Ben Kraas (https://github.com/KtRNofficial)
 """
 
-
+# imports
 import json
 import math
 import pandas as pd
@@ -13,44 +13,12 @@ from pathlib import Path
 import random
 import os
 
+# read/write functions
 def load_json(path: Path) -> dict:
     """loads and returns a json dict"""
     with open(path) as json_file:
         data = json.load(json_file)
     return data
-
-def beautydump(jsondict: dict, savepath: Path):
-    """dumps a json at a path with indentation"""
-    with open(savepath, "w") as f:
-        json.dump(jsondict, f, indent=4)
-
-def dump(jsondict: dict, savepath: Path):
-    """dumps a json at a path without indentation"""
-    with open(savepath, "w") as f:
-        json.dump(jsondict, f)
-
-def new_geojson() -> dict:
-    """Return the structure of a geojson dictionary"""
-    return {
-        "type": "FeatureCollection",
-        "features": []
-    }
-
-def new_feature(featuretype="MultiPoint", coordinates=None, properties=None) -> dict:
-    """Returns the structure of a single Feature. Should be populated"""
-    if coordinates is None: coordinates=[]
-    if properties is None: properties={}
-    return {
-        "type": "Feature",
-        "properties": properties,
-        "geometry": {
-            "type": featuretype,
-            "coordinates": coordinates
-        }
-    }
-
-def get_wd() -> Path:
-    return (Path("").absolute())
 
 def load_cams_air_qual_data(folderpath: str, start_year: int=2015, end_year: int=2050) -> pd.DataFrame:
     """
@@ -78,15 +46,56 @@ def load_cams_air_qual_data(folderpath: str, start_year: int=2015, end_year: int
     new_df = new_df.set_index("basetime")
     return new_df
 
+def beautydump(jsondict: dict, savepath: Path):
+    """dumps a json at a path with indentation"""
+    with open(savepath, "w") as f:
+        json.dump(jsondict, f, indent=4)
+
+def dump(jsondict: dict, savepath: Path):
+    """dumps a json at a path without indentation"""
+    with open(savepath, "w") as f:
+        json.dump(jsondict, f)
+
+# creator functions
+def new_geojson() -> dict:
+    """Return the structure of a geojson dictionary"""
+    return {
+        "type": "FeatureCollection",
+        "features": []
+    }
+
+def new_feature(featuretype="MultiPoint", coordinates=None, properties=None) -> dict:
+    """Returns the structure of a single Feature. Should be populated"""
+    if coordinates is None: coordinates=[]
+    if properties is None: properties={}
+    return {
+        "type": "Feature",
+        "properties": properties,
+        "geometry": {
+            "type": featuretype,
+            "coordinates": coordinates
+        }
+    }
+
+# miscallaneous
+def get_wd() -> Path:
+    """Returns the working directory path. Hacky and not used"""
+    return (Path("").absolute())
+
 def clear():
     """Clears the console"""
     os.system("CLS")
     return
 
+
+# classes
+
 class Feature:
     """
-    Object oriented feature handling.
-    Modifications always apply to the object itself
+    This class introduces an object-based approach to feature handling.
+    Compatible with GeojsonObject.
+
+    Author: Ben Kraas (https://github.com/KtRNofficial)
     """
     def __init__(self, featuretype: str="Point", coordinates: list=None, \
                  properties: dict=None, dictionary: dict=None):
@@ -122,6 +131,7 @@ class Feature:
         }
         self.update()
 
+    # populate object with some attributes. Not necessary but QOL
     def update(self):
         """This method serves the purpose of populating the objects' attributes."""
         self.type = self.dict["geometry"]["type"]
@@ -150,6 +160,7 @@ class Feature:
         elif ftype == "Polygon": 
             self.dict["geometry"]["coordinates"].insert(-2, coordinates)
 
+    # self-altering generators
     def gen_randscatter(self, extent: list, number: int=10):
         """Generates a random scatter MultiPoint"""
         lon_E, lat_S, lon_W, lat_N = extent # unpack
@@ -205,6 +216,7 @@ class Feature:
             counter_lat += 1
             pointer_lat -= y_dist
 
+    # offset methods. Return features by default
     def offset_circular(self, offset: float, offset_fixed: bool=False, inplace: bool=False) -> object:
         """
         Randomly offsets a MultiPoint feature classes points
@@ -265,7 +277,7 @@ class Feature:
         else:
            return Feature("MultiPoint", coord_collection)
 
-    # /// Private functions
+    # /// Private methods
     def PRIVATE_draw_circle(self, offset: float, radian: float, origin_x: float, \
                             origin_y: float, inwards_variation: float) -> list:
         """
@@ -600,7 +612,7 @@ class GeojsonObject:
         else:
             return enddict
 
-    # /// Private functions
+    # /// Private methods
     def PRIVATE_coordcrawler(self, *args):
         """PRIVATE. Crawls through a coords dict and returns all coords individually"""
         coords = []
