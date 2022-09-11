@@ -67,12 +67,10 @@ def load_cams_air_qual_data(folderpath: str, start_year: int=2015, end_year: int
     for date in range(start_year, (end_year+1)):
         try:
             datapath = Path(rf"{folderpath}\\cams_air_quality_analysis_{date}.csv").absolute() # broken, even though it should not be. Maybe because of folder space. TODO
-            print(datapath)
             df = pd.read_csv(datapath)
-            print(df)
             dflist.append(df)
         except:
-            print("This did not work even though it should :(")
+            print("This did not work even though it should :(\nThis problem can occurr if you have the repo saved in a path with whitespace")
             pass
 
     new_df = pd.concat(dflist, axis=0)
@@ -82,7 +80,8 @@ def load_cams_air_qual_data(folderpath: str, start_year: int=2015, end_year: int
 
 class Feature:
     """
-    Object handling geojson features
+    Object oriented feature handling.
+    Modifications always apply to the object itself
     """
     def __init__(self, featuretype: str="Point", coordinates: list=None, \
                  properties: dict=None, dictionary: dict=None):
@@ -129,7 +128,7 @@ class Feature:
     def get_coordinates_raw(self):
         """
         WIP!
-        Supposed to crawl through coordinate lists regardless of Featuretype
+        Supposed to crawl through coordinate lists regardless of Featuretype. Redundant, remove.
         """
         pass
 
@@ -138,7 +137,7 @@ class Feature:
         Add a vertex to the coordinate list. 
         Currently only supports MultiPoints and Polygons
             
-        WIP (beyond scope for this project)
+        WIP (full method beyond scope for this project)
         """
         ftype = self.dict["geometry"]["type"]
         if ftype == "MultiPoint": 
@@ -148,13 +147,28 @@ class Feature:
 
     def gen_randscatter(self, extent: list, number: int=10):
         """Generates a random scatter MultiPoint"""
-        lon_E, lat_S, lon_W, lat_N = extent
+        lon_E, lat_S, lon_W, lat_N = extent # unpack
         coordlist = []
         for x in range(number):
             randlon = random.uniform(lon_W, lon_E)
             randlat = random.uniform(lat_N, lat_S)
             coordlist.append([randlon, randlat])
         self.dict["geometry"]["coordinates"] = coordlist
+
+def scatter_randomly_in_domain(domain, count):
+    """randomly scatters points in a domain"""
+
+    lscoords = []
+
+    lon_E, lat_S, lon_W, lat_N = domain
+    for isnotused in range(count):
+        random_lon = random.uniform(lon_W, lon_E)
+        random_lat = random.uniform(lat_N, lat_S)
+
+        lscoords.append([random_lon, random_lat])
+
+    return lscoords
+        dict["geometry"]["coordinates"] = coordlist
     
     def gen_grid(self, extent: list, x_dist: float, y_dist: float):
         """Generate a normal point grid"""
