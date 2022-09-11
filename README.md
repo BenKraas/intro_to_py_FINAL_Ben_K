@@ -11,6 +11,13 @@ I have no idea why this breaks the pd.import_csv() but it does (for me)
 Progress:
 
 Task 1: Completed, checked
-Task 1: Completed, checked
-Task 1: Completed, checked
-Task 1: Completed, checked
+
+Task 2: Completed, checked
+
+Task 3: Completed, checked
+
+Task 4: Completed, checked
+
+Task 5: Completed, checked
+
+Task 6: Completed, checked
