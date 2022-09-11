@@ -154,21 +154,6 @@ class Feature:
             randlat = random.uniform(lat_N, lat_S)
             coordlist.append([randlon, randlat])
         self.dict["geometry"]["coordinates"] = coordlist
-
-def scatter_randomly_in_domain(domain, count):
-    """randomly scatters points in a domain"""
-
-    lscoords = []
-
-    lon_E, lat_S, lon_W, lat_N = domain
-    for isnotused in range(count):
-        random_lon = random.uniform(lon_W, lon_E)
-        random_lat = random.uniform(lat_N, lat_S)
-
-        lscoords.append([random_lon, random_lat])
-
-    return lscoords
-        dict["geometry"]["coordinates"] = coordlist
     
     def gen_grid(self, extent: list, x_dist: float, y_dist: float):
         """Generate a normal point grid"""
