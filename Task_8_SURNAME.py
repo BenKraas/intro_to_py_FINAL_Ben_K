@@ -23,7 +23,6 @@ keys_ge = keys.loc[keys["country"] == "Germany"]
 keys_ge_id_list = list(keys_ge["id"])
 keys_ge_nm_list = list(keys_ge["name"])
 
-print(keys_ge)
 """
 Subtask 8.1
 -----------
@@ -34,7 +33,9 @@ names. The result should be a single csv file.
 Hint: Use the Path class from the pathlib module to point to 
       the folder with air-quality-covid19-response data (see Lecture 10).
 """
- 
+
+df1 = df.loc[:, ["UID", "land_cover", "mast"]]
+
 
 
 
@@ -46,6 +47,7 @@ Hint: Use the Path class from the pathlib module to point to
 # print(idls)
 
 final_df.to_csv('Task_8_1.csv') 
+
 
 """
 Subtask 8.2
@@ -59,17 +61,15 @@ Answer the following:
   the max and min NO2 concentration) in each city?
 """
 
-
-
 ls = list()
 for city_id in keys_ge_id_list:
     # this is not necessarily an elegant solution but one that is obvious.
-    # I had issues with .agg
+    # I had issues with pd.DataFrame.agg() so I chose this solution.
     new_df = pd.DataFrame()
-    new_df["mean"] = df.loc[df["city_id"] == city_id, ["NO2"]].mean()
-    new_df["sem"]  = df.loc[df["city_id"] == city_id, ["NO2"]].sem()
-    new_df["mini"] = df.loc[df["city_id"] == city_id, ["NO2"]].min()
-    new_df["maxi"] = df.loc[df["city_id"] == city_id, ["NO2"]].max()
+    new_df["mean"] = data.loc[data["city_id"] == city_id, ["NO2"]].mean()
+    new_df["sem"]  = data.loc[data["city_id"] == city_id, ["NO2"]].sem()
+    new_df["mini"] = data.loc[data["city_id"] == city_id, ["NO2"]].min()
+    new_df["maxi"] = data.loc[data["city_id"] == city_id, ["NO2"]].max()
     
     xdf = keys_ge.loc[keys["id"] == city_id]
     new_df["city_name"] = xdf.iloc[0]['name']
@@ -78,6 +78,9 @@ for city_id in keys_ge_id_list:
     ls.append(new_df)
 
 final_df = pd.concat(ls)
+
+
+
 
 print(final_df)
 
