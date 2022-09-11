@@ -106,10 +106,13 @@ final_df = pd.concat([ls[0].stack(),
 
 
 
-### legacy
 
 
 
+
+#######################################################
+### Legacy
+#######################################################
 
 # ls = list()
 # for city_id in keys_ge_id_list:
@@ -130,6 +133,7 @@ final_df = pd.concat([ls[0].stack(),
 # final_df = pd.concat(ls)
 
 
+# Legacy: 
 
 # ls, new_df= list(), pd.DataFrame()
 # for city_id in keyslist:
@@ -191,3 +195,4 @@ that present the corresponding monthly values for each german city.
 """
 
 # unable
+
