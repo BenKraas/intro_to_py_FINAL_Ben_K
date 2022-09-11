@@ -7,6 +7,7 @@ Final Project - TASK 7
 ======================
 """
 import bk_functions as bk
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -17,7 +18,6 @@ import time # because I'm curious about code performance
 
 
 """
-
 Use the air-quality-covid19-response data from Lecture 10
 (available on moodle) to address the following subtasks:
 
@@ -46,8 +46,9 @@ seasons = df["season"].unique()
 # => this is the case
 
 
+
 # legacy code:
-# I shared the following code in our Whatsapp group - hope this was OK:
+# I shared the following code in our WhatsApp group:
 
     # season = []
     # for row in df.index:
@@ -120,7 +121,6 @@ the NO2 distribution and the the second the O3.
 Hint: https://seaborn.pydata.org/examples/faceted_histogram.html
 """
 
-# TODO!
 # I was unable to pack NO3 and O3 into a single displot.
 # This is my attempt with incorrect syntax:
 
@@ -131,7 +131,11 @@ Hint: https://seaborn.pydata.org/examples/faceted_histogram.html
 #
 # row=("O3", "NO2") not allowed!
 
+# TODO
+# fig, axes = plt.subplots(nrows=2)
 
+# sns.histplot(column="NO2", ax=axes[0])
+# sns.histplot(column="O3" , ax=axes[1])
 
 """
 Subtask 7.5
@@ -146,7 +150,7 @@ Hint: https://seaborn.pydata.org/generated/seaborn.heatmap.html#seaborn.heatmap
 df75 = df.resample('M', axis=0).mean()
 
 # add columns for month and year to easily use the pandas.pivot function
-df75['year'] = df75.index.year
+df75['year']  = df75.index.year
 df75['month'] = df75.index.month
 
 # pivot the table so months go on the y-axis and years on the x-axis

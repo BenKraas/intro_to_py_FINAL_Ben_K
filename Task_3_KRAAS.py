@@ -233,7 +233,7 @@ def convert_to_lcz(*args, **kwargs):
         # if a building does not fall under the classifications provided, the nearest
         # match would be the LCZ with the highest mean(s). 
         raise ValueError("LCZ code could not be found as there is no perfect match. \
-                          Implementation of closest LCZ not done (not required but easily possible)")
+                          Implementation of closest LCZ is WIP (not required but easily possible)")
 
 def between(number: any, range_list: list):
         """
@@ -253,7 +253,7 @@ def main():
                                         perv_srf=25, hgt_rough=6, terr_rough=6)
 
     print(LCZ_code, LCZ_name)
-    input("Press Enter to exit") # stop console from ending if you run code outside IDE
+    # input("Press Enter to exit") # stop console from ending if you run code outside IDE
 
 
 if __name__ == "__main__":

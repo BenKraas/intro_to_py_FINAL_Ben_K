@@ -11,10 +11,12 @@ represents all the major rivers of the world as linestrings.
 
 Answer the following 4 tasks.
 """
+
 import bk_functions as bk
 import json
 import pandas as pd
 from pathlib import Path
+
 
 """
 Subtask 5.1
@@ -43,14 +45,14 @@ new_gjson = bk.GeojsonObject(bk.new_geojson())
 new_feature = rivers.get_feature(id)
 new_gjson.append(new_feature)
 
-# new geojson dict: new_gjson.dict
        
 """
 Subtask 5.3
 -----------
 Calculate the length of each river and add it as a property.
 """
-# if you did calculations on small scale maps you could use geopy.distance.geodesic 
+# if you did calculations on small scale maps you should use 
+# geopy.distance.geodesic for greater precision
 
 for river_id in range(rivers.get_feature_count()):
     rivers.dict["features"][river_id]["properties"]["river_length"] \
@@ -59,7 +61,10 @@ for river_id in range(rivers.get_feature_count()):
 
 lens = rivers.query_all_property("river_length")
 names = rivers.get_names()
-df = pd.DataFrame({"length": lens, "name": names, 'dict_id': list(range(rivers.get_feature_count()))})
+df = pd.DataFrame({"length": lens, 
+                   "name": names, 
+                   "dict_id": list(range(rivers.get_feature_count()))
+                   })
 
 """
 Subtask 5.4
@@ -82,7 +87,6 @@ sl_river_obj.append(rivers.get_feature(sec_longest_river_id))
 sl_river_obj.dump("second_longest_river.geojson")
 
 
-# Additional remarks
 
 
 
@@ -93,6 +97,12 @@ sl_river_obj.dump("second_longest_river.geojson")
 
 
 
+
+
+
+
+
+# Additional remarks (no longer part of exercise)
 
 
 

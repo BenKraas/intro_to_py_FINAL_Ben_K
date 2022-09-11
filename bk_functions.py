@@ -5,14 +5,13 @@ I hope that this is not against the "rules" for the final exercise.
 Author: Ben Kraas (https://github.com/KtRNofficial)
 """
 
-# TODO:
-# Check if __private_method can be called correctly
 
 import json
 import math
 import pandas as pd
 from pathlib import Path
 import random
+import os
 
 def load_json(path: Path) -> dict:
     """loads and returns a json dict"""
@@ -66,7 +65,8 @@ def load_cams_air_qual_data(folderpath: str, start_year: int=2015, end_year: int
 
     for date in range(start_year, (end_year+1)):
         try:
-            datapath = Path(rf"{folderpath}\\cams_air_quality_analysis_{date}.csv").absolute() # broken, even though it should not be. Maybe because of folder space. TODO
+            # sometimes broken, even though it should not be. Maybe because of whitespace in folder name. 
+            datapath = Path(rf"{folderpath}\\cams_air_quality_analysis_{date}.csv").absolute() 
             df = pd.read_csv(datapath)
             dflist.append(df)
         except:
@@ -77,6 +77,11 @@ def load_cams_air_qual_data(folderpath: str, start_year: int=2015, end_year: int
     new_df["basetime"] = pd.to_datetime(new_df["basetime"])
     new_df = new_df.set_index("basetime")
     return new_df
+
+def clear():
+    """Clears the console"""
+    os.system("CLS")
+    return
 
 class Feature:
     """
@@ -179,7 +184,6 @@ class Feature:
         """
         if matrix == None and matrixname:
             matrix = self.PRIVATE_resolve_matrix(matrixname)
-        print(matrix)
         # funct start
         matlen = len(matrix)
         lon_E, lat_S, lon_W, lat_N = extent
@@ -200,38 +204,6 @@ class Feature:
             # decrement lat
             counter_lat += 1
             pointer_lat -= y_dist
-
-    def PRIVATE_resolve_matrix(self, matrixname: str) -> list:
-        """Private function. Provides example matrices to self.gen_grid_adv()"""
-        if matrixname == "full":
-            matrix = [[1]]
-        elif matrixname == "checkerboard":
-            matrix = [[1, 0], [0, 1]]
-        elif matrixname == "big_checkerboard":
-            matrix = [[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 1, 1], [0, 0, 1, 1]]
-        elif matrixname == "sparse":
-            matrix = [[1, 0], [0, 0]]
-        elif matrixname == "sparse_alt":
-            matrix = [[0, 0], [0, 1]]
-        elif matrixname == "diagonal":
-            matrix = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
-        elif matrixname == "diagonal":
-            matrix = [[0, 0, 1], [0, 1, 0], [1, 0, 0]]
-        elif matrixname == "raster":
-            matrix = [[1], [1, 0, 0], [1, 0, 0]]
-        elif matrixname == "heart": # easter egg
-            matrix = [[0, 1, 0, 0, 0, 1, 0, 0], 
-                      [1, 0, 1, 1, 1, 0, 1, 0], 
-                      [1, 0, 0, 0, 0, 0, 1, 0], 
-                      [0, 1, 0, 0, 0, 1, 0, 0], 
-                      [0, 0, 1, 0, 1, 0, 0, 0], 
-                      [0, 0, 0, 1, 0, 0, 0, 0], 
-                      [0]] 
-                      # you can tell I had fun here :)
-                      # my girlfriend approves, though she`d move matrix[1][3] down by one
-        else:
-            raise ValueError("A correct matrix name or matrix must be provided")
-        return matrix
 
     def offset_circular(self, offset: float, offset_fixed: bool=False, inplace: bool=False) -> object:
         """
@@ -254,7 +226,7 @@ class Feature:
             else: vari = random.random()    # random variation ranging from 1 (none) to 0 (full)
 
             t = random.uniform(0, 360)
-            x, y = self.__draw_circle(offset, t, j, k, inwards_variation=vari)
+            x, y = self.PRIVATE_draw_circle(offset, t, j, k, inwards_variation=vari)
             coord_collection.append([x, y])
         
         if inplace:
@@ -293,7 +265,8 @@ class Feature:
         else:
            return Feature("MultiPoint", coord_collection)
 
-    def __draw_circle(self, offset: float, radian: float, origin_x: float, \
+    # /// Private functions
+    def PRIVATE_draw_circle(self, offset: float, radian: float, origin_x: float, \
                             origin_y: float, inwards_variation: float) -> list:
         """
         Draws a point on a circle's circumference around a point
@@ -304,9 +277,41 @@ class Feature:
         y = (offset*inwards_variation) * math.sin(radian) + origin_y
         return [x, y]
     
-    def __inside_circle():
+    def PRIVATE_inside_circle():
         """Private function for checking if a value is inside a circle. WIP or not needed"""
         pass
+
+    def PRIVATE_resolve_matrix(self, matrixname: str) -> list:
+        """Private function. Provides example matrices to self.gen_grid_adv()"""
+        if matrixname == "full":
+            matrix = [[1]]
+        elif matrixname == "checkerboard":
+            matrix = [[1, 0], [0, 1]]
+        elif matrixname == "big_checkerboard":
+            matrix = [[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 1, 1], [0, 0, 1, 1]]
+        elif matrixname == "sparse":
+            matrix = [[1, 0], [0, 0]]
+        elif matrixname == "sparse_alt":
+            matrix = [[0, 0], [0, 1]]
+        elif matrixname == "diagonal":
+            matrix = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+        elif matrixname == "diagonal":
+            matrix = [[0, 0, 1], [0, 1, 0], [1, 0, 0]]
+        elif matrixname == "raster":
+            matrix = [[1], [1, 0, 0], [1, 0, 0]]
+        elif matrixname == "heart": # easter egg
+            matrix = [[0, 1, 0, 0, 0, 1, 0, 0], 
+                      [1, 0, 1, 1, 1, 0, 1, 0], 
+                      [1, 0, 0, 0, 0, 0, 1, 0], 
+                      [0, 1, 0, 0, 0, 1, 0, 0], 
+                      [0, 0, 1, 0, 1, 0, 0, 0], 
+                      [0, 0, 0, 1, 0, 0, 0, 0], 
+                      [0]] 
+                      # you can tell I had fun here :)
+                      # my girlfriend approves, though she`d move matrix[1][3] down by one
+        else:
+            raise ValueError("A correct matrix name or matrix must be provided")
+        return matrix
 
 
 class GeojsonObject:
@@ -558,7 +563,7 @@ class GeojsonObject:
 
         for feature in self.dict["features"]:
             for elem in feature["geometry"]["coordinates"]:
-                partls = self.__coordcrawler(elem)
+                partls = self.PRIVATE_coordcrawler(elem)
                 for elem in partls:
                     finalls.append(elem)
 
@@ -594,8 +599,9 @@ class GeojsonObject:
             self.dict = enddict
         else:
             return enddict
-        
-    def __coordcrawler(self, *args):
+
+    # /// Private functions
+    def PRIVATE_coordcrawler(self, *args):
         """PRIVATE. Crawls through a coords dict and returns all coords individually"""
         coords = []
         for elem in args:

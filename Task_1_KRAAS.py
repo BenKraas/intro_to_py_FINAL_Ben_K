@@ -14,8 +14,12 @@ Hint: To solve the tasks below, specify the keys and the indices you need manual
 """
 
 # prerequisite:
+import bk_functions as bk
+bk.clear()
+
 ls = list()
 
+### config:
 PRINT_LIST = True
 
 
@@ -114,7 +118,6 @@ for feature in lakes["features"]:
 
 lakes["features"] = lakes["features"][3:] # keeps 4 to end - effectively deleting index 0, 1, 2
 
-
 ls.append(len(lakes["features"])) # confirm that the list has been shortened
 
 
@@ -122,6 +125,3 @@ ls.append(len(lakes["features"])) # confirm that the list has been shortened
 if PRINT_LIST:
 	for number in ls:
 		print(str(number).replace("\n", ""))
-
-
-input("Enter to close...") # to stop the console from ending when running outside IDE

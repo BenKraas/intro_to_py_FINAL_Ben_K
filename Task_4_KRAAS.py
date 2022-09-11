@@ -58,9 +58,6 @@ gobj.convert_to_multipoint(inplace=True)
 
 
 
-
-
-
 # DEPRECATED but working functions (I made these before I implemented the object-oriented approach)
 
 import json
@@ -99,4 +96,3 @@ def poly_to_point(polydict: dict):
     return enddict
 
 # print(poly_to_point(polygon))
-
