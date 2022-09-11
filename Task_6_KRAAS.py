@@ -21,11 +21,12 @@ extent  = (90, 20, 70, 40)
 extent2 = (90.00252, 20.225, 20.1, 40.3)
 
 def gen_randpoint_dict(extent, number):
-    feature = bk.Feature(featuretype="MultiPoint")
+    feature = (bk.Feature(featuretype="MultiPoint"))
     feature.gen_randscatter(extent, number)
     mpgobj = bk.GeojsonObject()
     mpgobj.append(feature)
     return mpgobj
+
 
 ftobj = gen_randpoint_dict(extent, 200)
 
