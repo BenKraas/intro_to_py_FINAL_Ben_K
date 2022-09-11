@@ -8,8 +8,8 @@ Final Project - TASK 7
 """
 import bk_functions as bk
 import numpy as np
-from pathlib import Path
 import pandas as pd
+from pathlib import Path
 import random
 import seaborn as sns
 import time # because I'm curious about code performance
@@ -46,7 +46,6 @@ seasons = df["season"].unique()
 # => this is the case
 
 
-
 # legacy code:
 # I shared the following code in our Whatsapp group - hope this was OK:
 
@@ -60,7 +59,7 @@ seasons = df["season"].unique()
 
     # df["season"] = season
 
-# end of shared code
+# /// end of shared code
 
 
 """
@@ -106,9 +105,9 @@ Hint: https://seaborn.pydata.org/generated/seaborn.lmplot.html#seaborn.lmplot (S
 """
 # uncommmented for code performance - TODO
 
-#randlist7_3 = randselect(df, 2800)
-#sns.lmplot(x="O3", y="NO2", data=randlist7_3, aspect=2, markers=".", \
-           #scatter_kws={'alpha':0.15}, col_wrap=2, col="season")
+# randlist7_3 = randselect(df, 2800)
+# sns.lmplot(x="O3", y="NO2", data=randlist7_3, aspect=2, markers=".", \
+#            scatter_kws={'alpha':0.15}, col_wrap=2, col="season")
 
 """
 Subtask 7.4
@@ -122,10 +121,16 @@ Hint: https://seaborn.pydata.org/examples/faceted_histogram.html
 """
 
 # TODO!
-sns.displot(
-   df, y="O3", col="season", row=("O3", "NO2"),
-   binwidth=3, height=3, facet_kws=dict(margin_titles=True),
-)
+# I was unable to pack NO3 and O3 into a single displot.
+# This is my attempt with incorrect syntax:
+
+# sns.displot(
+#    df, y="O3", col="season", row=("O3", "NO2"),
+#    binwidth=3, height=3, facet_kws=dict(margin_titles=True),
+# )
+#
+# row=("O3", "NO2") not allowed!
+
 
 
 """
