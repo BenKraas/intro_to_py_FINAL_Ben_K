@@ -10,7 +10,9 @@ Use the air-quality-covid19-response data from Lecture 10
 (available on moodle) to address the following subtasks:
 """
 
+from xml.sax.xmlreader import IncrementalParser
 import bk_functions as bk
+import calendar
 import pandas as pd
 from pathlib import Path
 
@@ -68,37 +70,45 @@ Answer the following:
 
 ls = []
 
+# add columns for month and year to easily use the pandas.pivot function
+df_8_1_no2["year"]  = df_8_1_no2.index.year
+df_8_1_no2["month"] = df_8_1_no2.index.month
 
-
-for city_name in keys_ge_namm_list:
-    per_city_df = df_8_1_no2.loc[df_8_1_no2["city_id"] == city_name]
-
-    months = per_city_df.index.month.rename("month")
-    monthly_means = per_city_df.groupby([months]).mean()
-    
-    monthly_means.rename(columns={"NO2": city_name}, inplace=True)
-
-    #monthly_means.reset_index(drop=True, inplace=True)
-    ls.append(monthly_means)
-    #print(monthly_means)
-
-# concatenate into one nice dataframe
-final_df = pd.concat([ls[0].stack(), 
-                      ls[1].stack(), 
-                      ls[2].stack(), 
-                      ls[3].stack()], axis=0).unstack()
+statistics_df = df_8_1_no2.groupby(["month","city_id"]).agg(
+        NO2_mean = ("NO2", "mean"),
+        NO2_sem = ("NO2", "sem"),
+        NO2_min = ("NO2", "min"),
+        NO2_max = ("NO2", "max"),
+    )
 
 
 # - In which city, the NO2 concetration is greatest and when?
+newdf = statistics_df.loc[statistics_df["NO2_max"].idxmax()]
 
-
-    # Get city with hightest concentration
-
-    # I hate this approach with iat.
-    # However I could not extract the cell value only in any other way
+print("Task 1:\nGreatest NO2 concentration:", newdf.name[1], \
+      "\nMonth:", calendar.month_name[newdf.name[0]])
 
 
 # - Which month the NO2 becomes maximum and minimum in Cologne?
+
+# I interpret this as: Month with minimum and maximum mean :)
+CITY = "Cologne"
+
+# setup indices
+statistics_df = statistics_df.reset_index()
+statistics_df.set_index(['month'], inplace=True)
+
+# locate data
+months_max_month = statistics_df.groupby('city_id')['NO2_mean'].idxmax()
+months_min_month = statistics_df.groupby('city_id')['NO2_mean'].idxmin()
+
+# convert to int to use calendar.month_name
+cgn_max_month = int(months_max_month[CITY])
+cgn_min_month = int(months_min_month[CITY])
+
+# print
+print(f"\nTask 2:\nMonth with maximum average NO2 in {CITY.lower()}:", calendar.month_name[cgn_max_month])
+print(f"         \nMonth with minimum average NO2 in {CITY.lower()}:", calendar.month_name[cgn_min_month])
 
 
 # - What is the NO2 inter-annual range (i.e., the difference between
@@ -110,10 +120,34 @@ final_df = pd.concat([ls[0].stack(),
 
 
 
+
+
 #######################################################
 ### Legacy
 #######################################################
 
+# code garbage for your enjoyment. I hope I don't forget to delete this.
+
+# # legacy
+# for city_name in keys_ge_namm_list:
+#     per_city_df = df_8_1_no2.loc[df_8_1_no2["city_id"] == city_name]
+
+#     months = per_city_df.index.month.rename("month")
+#     monthly_means = per_city_df.groupby([months]).mean()
+    
+#     monthly_means.rename(columns={"NO2": city_name}, inplace=True)
+
+#     #monthly_means.reset_index(drop=True, inplace=True)
+#     ls.append(monthly_means)
+#     #print(monthly_means)
+
+# # concatenate into one nice dataframe
+# final_df = pd.concat([ls[0].stack(), 
+#                       ls[1].stack(), 
+#                       ls[2].stack(), 
+#                       ls[3].stack()], axis=0).unstack()
+
+# # legacy
 # ls = list()
 # for city_id in keys_ge_id_list:
 #     # this is not necessarily an elegant solution but one that is obvious.
@@ -133,7 +167,7 @@ final_df = pd.concat([ls[0].stack(),
 # final_df = pd.concat(ls)
 
 
-# Legacy: 
+# # Legacy: 
 
 # ls, new_df= list(), pd.DataFrame()
 # for city_id in keyslist:
@@ -149,7 +183,7 @@ final_df = pd.concat([ls[0].stack(),
 #     ls.append(newdf)
 
 
-### Legacy
+# # Legacy
 # for city_id in keyslist:
 #     mean = float(df.loc[df["city_id"] == city_id, ["NO2"]].mean())
 #     sem  = float(df.loc[df["city_id"] == city_id, ["NO2"]].sem())
@@ -158,7 +192,7 @@ final_df = pd.concat([ls[0].stack(),
 #     print(mean, sem, mini, maxi)
 
 
-### Legacy
+# # Legacy
 # ls, new_df= list(), pd.DataFrame()
 # for city_id in keyslist:
 #     newdf = df.loc[df["city_id"] == city_id].agg(
