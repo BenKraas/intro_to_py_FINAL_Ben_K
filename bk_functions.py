@@ -4,7 +4,6 @@ I hope that this is not against the "rules" for the final exercise.
 
 Author: Ben Kraas (https://github.com/KtRNofficial)
 """
-
 # imports
 import json
 import math
@@ -12,6 +11,7 @@ import pandas as pd
 from pathlib import Path
 import random
 import os
+
 
 # read/write functions
 def load_json(path: Path) -> dict:
@@ -89,7 +89,6 @@ def clear():
 
 
 # classes
-
 class Feature:
     """
     This class introduces an object-based approach to feature handling.

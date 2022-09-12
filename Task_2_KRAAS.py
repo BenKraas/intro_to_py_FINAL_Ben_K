@@ -37,7 +37,7 @@ import pandas as pd
 os.system("cls")
 
 # read the csv
-df = pd.read_csv("data.csv")
+df = pd.read_csv("task_data//data.csv")
 
 
 
