@@ -21,6 +21,7 @@ import bk_functions as bk
 bk.clear()
 
 ### config:
+# printing the list will display all results
 PRINT_LIST = True
 
 

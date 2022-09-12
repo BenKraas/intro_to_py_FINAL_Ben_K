@@ -3,7 +3,7 @@
 ## Overview:
 This is my final project for this course. All code was written by me unless specified.
 
-I will not commit after midnight so that you can pull this code directly from github.
+**I will not commit after midnight 12th September 2022** so that you can pull this code directly from github.
 You can of course verify this at [link](https://github.com/KtRNofficial/intro_to_py_FINAL_Ben_K/commits/main "Github commits")  
 
 

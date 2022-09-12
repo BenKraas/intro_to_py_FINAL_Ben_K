@@ -18,6 +18,8 @@ import seaborn as sns
 import bk_config as cfg 
 import bk_functions as bk
 
+# clear console
+bk.clear()
 
 # load all necessary data:
 

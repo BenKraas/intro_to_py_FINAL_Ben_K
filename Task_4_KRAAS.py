@@ -67,11 +67,7 @@ gobj.convert_to_multipoint(inplace=True)
 
 # DEPRECATED but working functions (I made these before I implemented the object-oriented approach)
 
-import json
-
-# data path of course not correct!
-with open(r"C:\Users\Kasto\OneDrive\Scripts\Python Seminar Übung\intro_to_py_FINAL_Ben_K\polygon.geojson", "r") as f:
-    polygon = json.load(f)
+polygon = bk.load_json(cfg.wd / "polygon.geojson")
 
 # required by task
 def single_poly_to_point(polydict: dict):

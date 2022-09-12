@@ -44,7 +44,6 @@ bk.clear()
 df = pd.read_csv(cfg.data / "data.csv")
 
 
-
 # 1. print the number of rows and columns of `df`?
 print(f"\nNr 1.\nRows: {len(df)}", f"Columns: {len(df.columns)}", end="\n")
 

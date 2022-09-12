@@ -70,6 +70,7 @@ df = pd.DataFrame({"length": lens,
                    "dict_id": list(range(rivers.get_feature_count()))
                    })
 
+
 """
 Subtask 5.4
 -----------
@@ -90,51 +91,3 @@ sl_river_obj.append(rivers.get_feature(sec_longest_river_id))
 
 sl_river_obj.dump(cfg.data / "second_longest_river.geojson")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Additional remarks (no longer part of exercise)
-
-
-
-# To read the `rivers.geojson` file use the following:
-
-import json
-
-with open("rivers.geojson", "r") as f:
-    rivers = json.load(f)
-
-
-# To save a geojson dict to a file adopt the following example:
-import json
-
-test_linestring = {
-    "type": "Feature",
-    "properties": {},
-    "geometry": {
-        "type": "LineString",
-        "coordinates": [
-            [0.0, 0.0],
-            [50.0, 40.0]
-        ]
-    }
-}
-
-savename = "test.geojson"
-
-with open(savename, "w") as f:
-    json.dump(test_linestring, f, indent=4)
-    
