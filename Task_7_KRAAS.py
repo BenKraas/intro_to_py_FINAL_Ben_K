@@ -6,16 +6,20 @@ Introduction to Programming and Applied Statistics
 Final Project - TASK 7
 ======================
 """
-import bk_functions as bk
-import matplotlib.pyplot as plt
-import numpy as np
+# imports
+# import matplotlib.pyplot as plt
+# import numpy as np
 import pandas as pd
-from pathlib import Path
+# from pathlib import Path
 import random
 import seaborn as sns
-import time # because I'm curious about code performance
+# import time # because I'm curious about code performance
 
+import bk_config as cfg
+import bk_functions as bk
 
+# clear console
+bk.clear()
 
 """
 Use the air-quality-covid19-response data from Lecture 10
@@ -31,7 +35,7 @@ Hint: Use the Path class from the pathlib module to point to
       the folder with air-quality-covid19-response data (see Lecture 10).
 """
 # load data
-df = bk.load_cams_air_qual_data("air-quality-covid19-response", 2015, 2019)
+df = bk.load_cams_air_qual_data(start_year=2015, end_year=2019)
 
 # select only NO2 and O3 for athens
 df = df.loc[df["city_id"] == "AQ003", ["NO2", "O3"]]
@@ -104,9 +108,9 @@ per season. Each subplot should also include a linear regression line.
 
 Hint: https://seaborn.pydata.org/generated/seaborn.lmplot.html#seaborn.lmplot (See example 7)
 """
-# uncommmented for code performance - TODO
+# uncommmented for code performance
 
-# randlist7_3 = randselect(df, 2800)
+# randlist7_3 = randselect(df, 28000)
 # sns.lmplot(x="O3", y="NO2", data=randlist7_3, aspect=2, markers=".", \
 #            scatter_kws={'alpha':0.15}, col_wrap=2, col="season")
 
@@ -130,6 +134,7 @@ Hint: https://seaborn.pydata.org/examples/faceted_histogram.html
 # )
 #
 # row=("O3", "NO2") not allowed!
+
 
 # TODO
 # fig, axes = plt.subplots(nrows=2)

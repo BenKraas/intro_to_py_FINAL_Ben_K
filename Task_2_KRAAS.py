@@ -28,16 +28,20 @@ Complete the following subtasks:
 16. Create a histogram and a boxplot presenting the `mast` data in `df`.
 
 """
-
+# imports
 import matplotlib.pyplot as plt
 import os
 import pandas as pd
+from pathlib import Path
 
-# empty console
-os.system("cls")
+import bk_config as cfg
+import bk_functions as bk
+
+# clear console
+bk.clear()
 
 # read the csv
-df = pd.read_csv("task_data//data.csv")
+df = pd.read_csv(cfg.data / "data.csv")
 
 
 

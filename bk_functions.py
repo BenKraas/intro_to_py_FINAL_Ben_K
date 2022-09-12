@@ -5,6 +5,7 @@ I hope that this is not against the "rules" for the final exercise.
 Author: Ben Kraas (https://github.com/KtRNofficial)
 """
 # imports
+from genericpath import exists
 import json
 import math
 import pandas as pd
@@ -12,6 +13,7 @@ from pathlib import Path
 import random
 import os
 
+import bk_config as cfg
 
 # read/write functions
 def load_json(path: Path) -> dict:
@@ -20,13 +22,23 @@ def load_json(path: Path) -> dict:
         data = json.load(json_file)
     return data
 
-def load_cams_air_qual_data(folderpath: str, start_year: int=2015, end_year: int=2050) -> pd.DataFrame:
+def load_cams_air_qual_data(folderpath: str=None, start_year: int=2015, end_year: int=2050) -> pd.DataFrame:
     """
     Specific function to load all "cams_air_quality_analysis_".csv files.
     Returns all files concatinated and properly formated with basetime as datetime index.
+    If data folder in not in cfg.wd (config file => working directory), a folderpath must be specified
+    If data is not in a folder called "air-quality-covid19-response", a folderpath must be specified
+
     A path to the data folder must be provided
     Both start_year and end_year are included in the returned DataFrame
     """
+
+    if not folderpath:
+        if exists(cfg.wd / "air-quality-covid19-response" / "CAMS_AQ_LOCATIONS_V1.csv"):
+            folderpath = cfg.wd / "air-quality-covid19-response"
+        else:
+            raise ValueError("Automatic folderpath failed. Please specify a folderpath manually")
+
     dflist = []
     # we can try to import every csv name up to 2050 (function default)
     # That way, no "end"-year needs to be defined
@@ -64,7 +76,7 @@ def new_geojson() -> dict:
         "features": []
     }
 
-def new_feature(featuretype="MultiPoint", coordinates=None, properties=None) -> dict:
+def new_feature(featuretype: str="MultiPoint", coordinates: list=None, properties: dict=None) -> dict:
     """Returns the structure of a single Feature. Should be populated"""
     if coordinates is None: coordinates=[]
     if properties is None: properties={}
@@ -78,9 +90,6 @@ def new_feature(featuretype="MultiPoint", coordinates=None, properties=None) -> 
     }
 
 # miscallaneous
-def get_wd() -> Path:
-    """Returns the working directory path. Hacky and not used"""
-    return (Path("").absolute())
 
 def clear():
     """Clears the console"""
@@ -349,7 +358,7 @@ class GeojsonObject:
         if not geojson:
             geojson = new_geojson()
         self.dict = geojson
-        self.dict_path = Path(name).absolute()
+        self.dict_path = Path(cfg.data / name)
 
     # load data into object
     def loadwd(self, path: object):
@@ -357,7 +366,7 @@ class GeojsonObject:
         Loads a geosjon dict from working directory.
         This is the EASIEST way to load
         """
-        self.dict_path = Path(path).absolute()
+        self.dict_path = Path(cfg.wd / path)
         self.dict = load_json(self.dict_path)
     
     def loadrel(self, path: object):
@@ -366,8 +375,8 @@ class GeojsonObject:
         self.dict = load_json(self.dict_path)
     
     def loadsample(self):
-        pt = Path("sample.geojson").absolute()
-
+        pt = Path(cfg.wd / "sample.geojson")
+        print(pt)
         try:
             self.dict = load_json(pt)
             self.dict_path = pt
@@ -387,7 +396,7 @@ class GeojsonObject:
         self.dict_path = Path(abs_path).absolute()
 
     # manage data
-    def append(self, feature):
+    def append(self, feature: Feature):
         """
         Appends the specified feature to Geojson features.
         Can accept the Feature object or a feature dict
@@ -407,15 +416,19 @@ class GeojsonObject:
 
     # save data
     def dumpto(self, path: Path):
+        """Saves self.dict at a specified location"""
+        if not path: raise ValueError("Specify path")
+
         with open(path, "w") as fp:
             # use indent=4 to make json more readable
             json.dump(self.dict, fp, indent=4)
         
     def dump(self, name: str=None):
+        """Saves self.dict at default location if no path is given"""
         if name:
-            newname = Path(name).absolute()
+            newname = Path(name)
         else:
-            newname = Path("edited_" + self.dict_path.name).absolute()
+            newname = Path(cfg.data / self.dict_path.name)
         self.dumpto(newname)
 
     # get feature information
@@ -539,7 +552,7 @@ class GeojsonObject:
         Calculates the circumference (m) of a Polygon
         Can only handle METRIC "coordinates" 
 
-        A conversion method is currently not planned (out of scope)
+        A conversion method is currently not planned (oust of scope)
         """
         coordlist = self.dict["features"][id]["geometry"]["coordinates"][0]
 

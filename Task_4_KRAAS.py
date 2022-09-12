@@ -15,7 +15,13 @@ the given coordinates and save it at the given savepath.
 
 Hint:  See the example below on how to save a geojson dictionary.
 """
+# imports
+import bk_config as cfg
 import bk_functions as bk
+
+# clear console
+bk.clear()
+
 
 def bounds_to_geojson(coordinates: tuple, savepath: str):
     """
@@ -39,7 +45,7 @@ def bounds_to_geojson(coordinates: tuple, savepath: str):
 
     bk.beautydump(test_dictionary, savepath)
 
-bounds_to_geojson((1, -1, -1, 1), "bk_bounds.geojson")
+bounds_to_geojson((1, -1, -1, 1), (cfg.data / "bk_bounds.geojson"))
 
 
 """
@@ -63,6 +69,7 @@ gobj.convert_to_multipoint(inplace=True)
 
 import json
 
+# data path of course not correct!
 with open(r"C:\Users\Kasto\OneDrive\Scripts\Python Seminar Übung\intro_to_py_FINAL_Ben_K\polygon.geojson", "r") as f:
     polygon = json.load(f)
 

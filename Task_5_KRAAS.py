@@ -11,12 +11,16 @@ represents all the major rivers of the world as linestrings.
 
 Answer the following 4 tasks.
 """
-
-import bk_functions as bk
+# imports
 import json
 import pandas as pd
 from pathlib import Path
 
+import bk_config as cfg
+import bk_functions as bk
+
+# clear console
+bk.clear()
 
 """
 Subtask 5.1
@@ -84,7 +88,7 @@ sl_river_obj = bk.GeojsonObject(bk.new_geojson())
 
 sl_river_obj.append(rivers.get_feature(sec_longest_river_id))
 
-sl_river_obj.dump("second_longest_river.geojson")
+sl_river_obj.dump(cfg.data / "second_longest_river.geojson")
 
 
 

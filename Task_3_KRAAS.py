@@ -40,14 +40,20 @@ Test your code with the following values
 •	the terrain roughness class: 6
 
 """
-
+# imports
 import json
 import pandas as pd
 from os.path import exists
+from pathlib import Path
+
+import bk_config as cfg
 import bk_functions as bk
 
+# clear console
+bk.clear()
 
-def convert_to_lcz(*args, **kwargs):
+
+def convert_to_lcz(*args, **kwargs) -> tuple:
     """
     This functions calculates the LCZ (Local climate zone) given 7 parameters.
 
@@ -72,7 +78,7 @@ def convert_to_lcz(*args, **kwargs):
 
     ### nested functions
     
-    def import_lcz_data():
+    def import_lcz_data() -> pd.DataFrame:
         """
         PRIVATE function specific to convert_to_lcz()
 
@@ -84,18 +90,18 @@ def convert_to_lcz(*args, **kwargs):
         This makes it much easier not to confuse the index with the LCZ codes!
         """
 
-        if not exists('LCZ_key_data.json'):
+        if not exists(cfg.data / "LCZ_key_data.json"):
             print("JSON created!")
             dump_data_json()
         
-        data = bk.load_json('LCZ_key_data.json')
+        data = bk.load_json(Path(cfg.data / "LCZ_key_data.json").absolute())
 
         dataf = pd.DataFrame(data)
         dataf.set_index("code", inplace=True)
 
         return dataf
 
-    def import_args(args: tuple, kwargs: dict):
+    def PRIVATE_import_args(args: tuple, kwargs: dict):
         """
         PRIVATE function specific to convert_to_lcz()
 
@@ -110,6 +116,8 @@ def convert_to_lcz(*args, **kwargs):
         if len(args) != 7 and len(kwargs) != 7:
             raise ValueError("convert_to_lcz(): \
                 Not the correct amout of numbers given")
+
+        # check if only args OR kwargs were given
         elif len(args) > 0 and len(kwargs) > 0:
             raise ValueError("convert_to_lcz(): \
                 You can only provide either args or kwargs!")
@@ -172,7 +180,7 @@ def convert_to_lcz(*args, **kwargs):
                         "terrain_rough_class":  trc_list
                         }
 
-        with open("LCZ_key_data.json", "w") as fp:
+        with open((cfg.data / "LCZ_key_data.json"), "w") as fp:
             # use indent=4 to make json more readable
             json.dump(LCZ_tresholds , fp) 
     
@@ -217,7 +225,7 @@ def convert_to_lcz(*args, **kwargs):
     
     # importing of args/kwargs
     # these are specifications which you want to check
-    config_dict = import_args(args, kwargs)
+    config_dict = PRIVATE_import_args(args, kwargs)
 
     # return dataframe with number in range or not (1=in range, 0=not in range)
     comb_bool = comb(LCZ_key, config_dict)
@@ -248,11 +256,12 @@ def between(number: any, range_list: list):
 
 
 def main():
+    bk.clear()
     LCZ_code, LCZ_name = convert_to_lcz(sky_view_f=0.4, aspect_r=0.90, \
                                         build_srf=50, imperv_srf=40, \
                                         perv_srf=25, hgt_rough=6, terr_rough=6)
 
-    print(LCZ_code, LCZ_name)
+    print("LCZ code and name: ", LCZ_code, "   ", LCZ_name)
     # input("Press Enter to exit") # stop console from ending if you run code outside IDE
 
 

@@ -13,11 +13,12 @@ Hint: To solve the tasks below, specify the keys and the indices you need manual
 
 """
 
-# prerequisite:
+# imports
+import bk_config as cfg
 import bk_functions as bk
-bk.clear()
 
-ls = list()
+# clear console
+bk.clear()
 
 ### config:
 PRINT_LIST = True
@@ -26,9 +27,10 @@ PRINT_LIST = True
 # To read the `lakes.geojson` file use the following:
 import json
 
-with open("lakes.geojson", "r") as f:
+with open(cfg.wd / "lakes.geojson", "r") as f:
     lakes = json.load(f)
-    
+
+ls = list() 
 
 # 1. What is the datatype of `lakes`?
 ls.append(type(lakes))

@@ -6,7 +6,12 @@ Introduction to Programming and Applied Statistics
 Final Project - TASK 6
 ======================
 """
+# imports
+import bk_config as cfg
 import bk_functions as bk
+
+# clear console
+bk.clear()
 
 """
 Subtask 6.1
@@ -30,7 +35,7 @@ def gen_randpoint_dict(extent, number):
 
 ftobj = gen_randpoint_dict(extent, 200)
 
-ftobj.set_path_abs("randompoints.geojson")
+ftobj.set_path(cfg.data / "randompoints.geojson")
 
 ftobj.dump()
 
@@ -52,7 +57,8 @@ def create_checkerboard(extent, dist_x, dist_y) -> bk.Feature:
 
 gobj = bk.GeojsonObject()
 gobj.append(create_checkerboard(extent, 1, 1))
-gobj.dump("checkerboard.geojson")
+gobj.set_path(cfg.data / "checkerboard.geojson")
+gobj.dump()
 
 
 """
@@ -77,15 +83,28 @@ Hint: Check the material of L6.
 
 def random_grid(extent, grid_spacing_x, grid_spacing_y, shift, \
                 offset_fixed=False, iterations=1) -> bk.GeojsonObject:
+    """
     
+    shift: offset the origin by this amount
+    offset_fixed: The offset value will always be the exact distance to the origin
+    iterations: Number of points created per origin
+    """
     shift_ft = bk.Feature(featuretype="MultiPoint")
     shift_ft.gen_grid(extent, grid_spacing_x, grid_spacing_y)
     shift_ft_obj = bk.GeojsonObject()
-    for foo in range(iterations):
-        shift_ft_obj.append(shift_ft.offset_circular_even(shift))
 
+    if not offset_fixed:
+        for foo in range(iterations):
+            shift_ft_obj.append(shift_ft.offset_circular_even(shift))
+    else:
+        for foo in range(iterations):
+            shift_ft_obj.append(shift_ft.offset_circular(shift, offset_fixed=True))
+    
     return shift_ft_obj
 
 extent  = (90, 20, 80, 30)
-shift_ft_obj = random_grid(extent, 11, 11, 1, offset_fixed=False, iterations=1000)
-shift_ft_obj.dump("offset_dict.geojson")
+
+shift_ft_obj = random_grid(extent, 11, 11, 1, offset_fixed=False, iterations=100)
+
+shift_ft_obj.set_path(cfg.data / "offset_dict.geojson")
+shift_ft_obj.dump()
