@@ -10,11 +10,12 @@ Use the air-quality-covid19-response data from Lecture 10
 (available on moodle) to address the following subtasks:
 """
 
-from xml.sax.xmlreader import IncrementalParser
 import bk_functions as bk
 import calendar
 import pandas as pd
 from pathlib import Path
+
+import bk_config as cfg 
 
 
 # load all necessary data:
@@ -23,7 +24,7 @@ data = bk.load_cams_air_qual_data("air-quality-covid19-response", 2015, 2019)
 keys = pd.read_csv(Path(r"air-quality-covid19-response\CAMS_AQ_LOCATIONS_V1.csv"))
 keys_ge = keys.loc[keys["country"] == "Germany"] 
 keys_ge_id_list = list(keys_ge["id"])
-keys_ge_namm_list = list(keys_ge["name"])
+keys_ge_name_list = list(keys_ge["name"])
 
 """
 Subtask 8.1
@@ -50,7 +51,7 @@ df_8_1 = pd.concat(ls)
 df_8_1_no2 = df_8_1.loc[:, ["NO2", "city_id"]]
 
 # replace city_id with city_name (as required - i'd instead make a new column)
-for city_id, name in zip(keys_ge_id_list, keys_ge_namm_list):
+for city_id, name in zip(keys_ge_id_list, keys_ge_name_list):
     df_8_1_no2.loc[(df_8_1_no2.city_id == city_id),'city_id'] = name
 
 # save as .csv
@@ -103,19 +104,75 @@ months_max_month = statistics_df.groupby('city_id')['NO2_mean'].idxmax()
 months_min_month = statistics_df.groupby('city_id')['NO2_mean'].idxmin()
 
 # convert to int to use calendar.month_name
-cgn_max_month = int(months_max_month[CITY])
-cgn_min_month = int(months_min_month[CITY])
+cgn_max_month = calendar.month_name[int(months_max_month[CITY])]
+cgn_min_month = calendar.month_name[int(months_min_month[CITY])]
 
 # print
-print(f"\nTask 2:\nMonth with maximum average NO2 in {CITY.lower()}:", calendar.month_name[cgn_max_month])
-print(f"         \nMonth with minimum average NO2 in {CITY.lower()}:", calendar.month_name[cgn_min_month])
+print(f"\nTask 2:\nMonth with maximum average NO2 in {CITY.lower()}:", cgn_max_month)
+print(f"         \nMonth with minimum average NO2 in {CITY.lower()}:", cgn_min_month)
 
 
 # - What is the NO2 inter-annual range (i.e., the difference between
 #   the max and min NO2 concentration) in each city?
 
+print("\nTask 3:")
+
+for name in keys_ge_name_list:
+    city_df = statistics_df.loc[statistics_df["city_id"] == name]
+    difference = city_df["NO2_mean"].max() - city_df["NO2_mean"].min()
+    print(f"Difference in {name}:".ljust(25), difference)
 
 
+
+"""
+Subtask 8.3
+-----------
+Using the data from subtask 8.2 calculate the 95% lower and upper
+confidence intervals for each monthly mean.
+"""
+
+DATADIR = r"C:\Users\panosis\Desktop\air-quality-covid19-response"
+VARIABLES = ["NO2", "O3", "PM10"]
+CRITICAL_VAL = -1.65 # one-tail critical value for 95% confidence level.
+
+def hypothesis_testing(var="NO2"):
+    """
+    Test if the drop in Air quality during the first lockdown is statistically significant.
+
+    Original code author: Panagiotis Sismanidis
+    Edited by: Ben Kraas
+    """
+    
+    if var not in VARIABLES:
+        raise ValueError("Invalid variable name.")
+    
+    data = pd.read_csv(cfg.wd / "city_means_lockdown1.csv")  
+    data.set_axis(data["name"], inplace=True)
+    
+    z_scores = (data[f"{var}_mean_lockdown"] - data[f"{var}_mean_precovid"]) / data[f"{var}_sem_precovid"]
+    
+    # Print the test results
+    print(f"\nIs the drop in {var} statistically significant at the 5/% level?")
+    for name, z in zip(z_scores.index, z_scores.values):    
+        if z < CRITICAL_VAL:
+            print(f"{name:<10} Yes")
+        else:
+           print(f"{name:<10} No")
+    
+    return z_scores
+
+# unable
+
+
+"""
+Subtask 8.4
+-----------
+Use the csv from subtask 8.1 and calculate the monthly mean, minimum, and maximum
+NO2 per year and city. Create a figure with 3 lineplots (one subplot for each statistic)
+that present the corresponding monthly values for each german city.
+"""
+
+# unable
 
 
 
@@ -208,25 +265,4 @@ print(f"         \nMonth with minimum average NO2 in {CITY.lower()}:", calendar.
 # new_df = pd.concat(ls)
 
 # dfpivot = new_df.pivot(index="city_id", columns=)
-
-
-"""
-Subtask 8.3
------------
-Using the data from subtask 8.2 calculate the 95% lower and upper
-confidence intervals for each monthly mean.
-"""
-
-# unable
-
-
-"""
-Subtask 8.4
------------
-Use the csv from subtask 8.1 and calculate the monthly mean, minimum, and maximum
-NO2 per year and city. Create a figure with 3 lineplots (one subplot for each statistic)
-that present the corresponding monthly values for each german city.
-"""
-
-# unable
 

@@ -7,7 +7,7 @@ Final Project - TASK 7
 ======================
 """
 # imports
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 # import numpy as np
 import pandas as pd
 # from pathlib import Path
@@ -136,11 +136,11 @@ Hint: https://seaborn.pydata.org/examples/faceted_histogram.html
 # row=("O3", "NO2") not allowed!
 
 
-# TODO
-# fig, axes = plt.subplots(nrows=2)
-
-# sns.histplot(column="NO2", ax=axes[0])
-# sns.histplot(column="O3" , ax=axes[1])
+# the diagrams have to be observed with caution: the ranges are not comparable.
+# I could not figure out how to strech the diagrams 
+# to x_range = [0, 100] and y = [0, 100]
+sns.displot(df, x="NO2",col="season", kde=True, kde_kws={'cut': 0})
+sns.displot(df, x="O3" ,col="season", kde=True, kde_kws={'cut': 0})
 
 """
 Subtask 7.5
