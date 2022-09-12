@@ -9,13 +9,14 @@ Final Project - TASK 8
 Use the air-quality-covid19-response data from Lecture 10
 (available on moodle) to address the following subtasks:
 """
-
-import bk_functions as bk
+# imports
 import calendar
 import pandas as pd
 from pathlib import Path
+import seaborn as sns
 
 import bk_config as cfg 
+import bk_functions as bk
 
 
 # load all necessary data:
@@ -55,7 +56,7 @@ for city_id, name in zip(keys_ge_id_list, keys_ge_name_list):
     df_8_1_no2.loc[(df_8_1_no2.city_id == city_id),'city_id'] = name
 
 # save as .csv
-df_8_1_no2.to_csv("german_cities_NO2_Task_8.csv")
+df_8_1_no2.to_csv(cfg.data / "german_cities_NO2_Task_8.csv")
 
 """
 Subtask 8.2
@@ -141,6 +142,8 @@ def hypothesis_testing(var="NO2"):
 
     Original code author: Panagiotis Sismanidis
     Edited by: Ben Kraas
+    
+    Not functional
     """
     
     if var not in VARIABLES:
@@ -171,8 +174,32 @@ Use the csv from subtask 8.1 and calculate the monthly mean, minimum, and maximu
 NO2 per year and city. Create a figure with 3 lineplots (one subplot for each statistic)
 that present the corresponding monthly values for each german city.
 """
+# load data
+df_8_4 = pd.read_csv(cfg.data / "german_cities_NO2_Task_8.csv")
+df_8_4["basetime"] = pd.to_datetime(df_8_4["basetime"])
+df_8_4.set_index("basetime", inplace=True)
 
-# unable
+# calculate table
+df_8_4["year"] = df_8_4.index.year
+df_8_4["months"] = df_8_4.index.month
+for city in keys_ge_id_list:
+    df_8_41 = df_8_4.groupby(["year","months","city_id"]).agg(
+        NO2_mean = ("NO2", "mean"),
+        NO2_min = ("NO2", "min"),
+        NO2_max = ("NO2", "max"),
+    )
+
+# not able to present this as a lineplot as I am using a multi-index to structure the data
+
+
+
+
+
+
+
+
+
+
 
 
 
